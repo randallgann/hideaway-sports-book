@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  game: one
+  line_type: MyString
+  home_odds: 9.99
+  away_odds: 9.99
+  spread: 9.99
+  total: 9.99
+  over_odds: 9.99
+  under_odds: 9.99
+
+two:
+  game: two
+  line_type: MyString
+  home_odds: 9.99
+  away_odds: 9.99
+  spread: 9.99
+  total: 9.99
+  over_odds: 9.99
+  under_odds: 9.99

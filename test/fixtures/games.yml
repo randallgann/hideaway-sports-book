@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  home_team: one
+  away_team: one
+  game_time: 2025-10-28 04:21:02
+  sport: MyString
+  status: MyString
+  home_score: 1
+  away_score: 1
+
+two:
+  home_team: two
+  away_team: two
+  game_time: 2025-10-28 04:21:02
+  sport: MyString
+  status: MyString
+  home_score: 1
+  away_score: 1
