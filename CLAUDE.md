@@ -8,7 +8,54 @@ This is a **casual learning project** for understanding Ruby on Rails and sports
 
 **Ruby Version**: 3.3.6
 **Rails Version**: 8.1.0
-**Database**: SQLite3
+**Database**: PostgreSQL 16 (running in Docker)
+
+## Initial Setup
+
+### Environment Variables
+Copy the example environment file and configure your credentials:
+```bash
+cp .env.example .env
+```
+
+Then edit `.env` and set:
+- `ODDS_API_KEY`: Your API key from https://the-odds-api.com/
+- `POSTGRES_USER`: Database username (e.g., `postgres`)
+- `POSTGRES_PASSWORD`: Database password (choose a secure password)
+
+## Docker Setup
+
+This project uses Docker Compose to run PostgreSQL. The database runs in a container for easy setup and teardown.
+
+### Prerequisites
+- Docker and Docker Compose installed on your machine
+
+### Starting the Database
+```bash
+# Start PostgreSQL in detached mode
+docker-compose up -d
+
+# Check if the container is running
+docker ps
+
+# View logs
+docker-compose logs postgres
+```
+
+### Stopping the Database
+```bash
+# Stop the database container
+docker-compose down
+
+# Stop and remove volumes (WARNING: deletes all data)
+docker-compose down -v
+```
+
+### Database Configuration
+- **Development DB**: `hideaway_sports_book_db`
+- **Test DB**: `hideaway_sports_book_test_db`
+- **Port**: 5433 (mapped from container's 5432 to avoid conflicts with other PostgreSQL instances)
+- **Credentials**: Set in `.env` file (see `.env.example`)
 
 ## Development Environment
 

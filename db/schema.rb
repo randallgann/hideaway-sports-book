@@ -11,6 +11,9 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[8.1].define(version: 2025_11_01_161715) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_catalog.plpgsql"
+
   create_table "betting_lines", force: :cascade do |t|
     t.decimal "away_odds", precision: 8, scale: 2
     t.datetime "created_at", null: false
