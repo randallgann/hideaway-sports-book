@@ -14,6 +14,31 @@ This is a **casual learning project** for understanding Ruby on Rails and sports
 
 **VS Code Configuration**: Uses Shopify Ruby LSP extension with rbenv version manager. Configuration in `.vscode/settings.json` uses `rubyLsp.rubyVersionManager.identifier: "rbenv"` to auto-detect Ruby version from `.ruby-version` file. Tests can be run via VS Code UI or command line.
 
+## Git Workflow
+
+**Main Branch**: `main` is the production branch. All feature work should be branched from main and merged back via pull requests.
+
+**Branch Naming**:
+- Feature branches: `feature/description` (e.g., `feature/add-user-bets`)
+- Hotfix branches: `hotfix/description` (e.g., `hotfix/fix-odds-calculation`)
+- Bug fix branches: `bugfix/description` (e.g., `bugfix/broken-game-display`)
+
+**Workflow**:
+```bash
+# Start new feature from main
+git checkout main
+git pull origin main
+git checkout -b feature/my-feature
+
+# Work on feature, commit changes
+git add .
+git commit -m "Description of changes"
+
+# Push and create PR
+git push -u origin feature/my-feature
+# Then create pull request on GitHub to merge into main
+```
+
 ## Common Commands
 
 ### Development Server
