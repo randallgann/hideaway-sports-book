@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Rails Server with rdbg",
+      "type": "rdbg",
+      "request": "launch",
+      "script": "${workspaceFolder}/bin/rails",
+      "args": ["server", "-p", "3001"],
+      "askParameters": false,
+      "useBundler": true,
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Attach with rdbg",
+      "type": "rdbg",
+      "request": "attach",
+      "rdbgPath": "${workspaceFolder}/.rdbg-socket",
+      "localfsMap": []
+    }
+  ]
+}
