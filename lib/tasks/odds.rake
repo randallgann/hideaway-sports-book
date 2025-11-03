@@ -1,5 +1,5 @@
 namespace :odds do
-  desc "Sync odds for all default sports (NBA, NFL, NCAAF)"
+  desc "Sync odds for all default sports (NBA, NCAAB, NFL, NCAAF)"
   task sync: :environment do
     puts "Starting odds sync for all sports..."
     puts "=" * 60
@@ -34,6 +34,7 @@ namespace :odds do
       puts "Usage: rake odds:sync_sport[basketball_nba]"
       puts "\nAvailable sports:"
       puts "  - basketball_nba"
+      puts "  - basketball_ncaab"
       puts "  - americanfootball_nfl"
       puts "  - americanfootball_ncaaf"
       exit 1

@@ -21,9 +21,10 @@ class OddsApi::TeamMatcherTest < ActiveSupport::TestCase
   test "creates new team when no match found" do
     assert_difference 'Team.count', 1 do
       team = @matcher.find_or_create_team("Boston Celtics", "basketball_nba", external_id: "api_celtics_123")
-      assert_equal "Boston Celtics", team.name
+      assert_equal "Celtics", team.name
+      assert_equal "Boston", team.city
       assert_equal "basketball_nba", team.sport
-      assert_equal "api", team.data_source
+      assert_equal "the_odds_api", team.data_source
       assert_equal "api_celtics_123", team.external_id
     end
   end
@@ -41,7 +42,7 @@ class OddsApi::TeamMatcherTest < ActiveSupport::TestCase
     team = @matcher.find_or_create_team("Los Angeles Lakers", "basketball_nba", external_id: "api_lakers_789")
     assert_equal @lakers.id, team.id
     assert_equal "api_lakers_789", team.reload.external_id
-    assert_equal "api", team.reload.data_source
+    assert_equal "the_odds_api", team.reload.data_source
   end
 
   test "handles team names with city prefixes" do
@@ -76,8 +77,9 @@ class OddsApi::TeamMatcherTest < ActiveSupport::TestCase
   test "extracts city from full team name when creating" do
     team = @matcher.find_or_create_team("Boston Celtics", "basketball_nba", external_id: "api_celtics_123")
 
-    assert_equal "Boston Celtics", team.name
-    # City extraction logic may vary, this is optional behavior
+    assert_equal "Celtics", team.name
+    assert_equal "Boston", team.city
+    assert_equal "CEL", team.abbreviation
   end
 
   test "does not create duplicate teams" do

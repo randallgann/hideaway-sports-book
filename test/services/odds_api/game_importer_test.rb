@@ -26,7 +26,7 @@ class OddsApi::GameImporterTest < ActiveSupport::TestCase
       assert_equal @lakers.id, game.home_team_id
       assert_equal @warriors.id, game.away_team_id
       assert_equal "basketball_nba", game.sport
-      assert_equal "api", game.data_source
+      assert_equal "the_odds_api", game.data_source
       assert_equal "scheduled", game.status
       assert_not_nil game.last_synced_at
     end
@@ -39,7 +39,7 @@ class OddsApi::GameImporterTest < ActiveSupport::TestCase
       away_team: @warriors,
       game_time: 2.days.from_now,
       sport: "basketball_nba",
-      data_source: "api"
+      data_source: "the_odds_api"
     )
 
     api_event = build_api_event(
@@ -171,7 +171,7 @@ class OddsApi::GameImporterTest < ActiveSupport::TestCase
       away_team: @warriors,
       game_time: 2.days.from_now,
       sport: "basketball_nba",
-      data_source: "api"
+      data_source: "the_odds_api"
     )
 
     existing_line = BettingLine.create!(
@@ -280,7 +280,7 @@ class OddsApi::GameImporterTest < ActiveSupport::TestCase
       away_team: @warriors,
       game_time: 2.days.from_now,
       sport: "basketball_nba",
-      data_source: "api"
+      data_source: "the_odds_api"
     )
 
     events = [

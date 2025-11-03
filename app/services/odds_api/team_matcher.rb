@@ -52,20 +52,28 @@ module OddsApi
     def update_team_metadata(team, external_id)
       updates = {}
       updates[:external_id] = external_id if external_id.present? && team.external_id.nil?
-      updates[:data_source] = "api" if team.data_source == "manual"
+      updates[:data_source] = "the_odds_api" if team.data_source == "manual"
 
       team.update(updates) if updates.any?
     end
 
     def create_team(team_name, sport, external_id)
       Team.create!(
-        name: team_name,
+        name: extract_team_name(team_name),
         city: extract_city(team_name),
         abbreviation: generate_abbreviation(team_name),
         sport: sport,
         external_id: external_id,
-        data_source: "api"
+        data_source: "the_odds_api"
       )
+    end
+
+    def extract_team_name(team_name)
+      # Extract team nickname: assume last word is the team name
+      # e.g., "Los Angeles Lakers" -> "Lakers"
+      # "New Orleans Saints" -> "Saints"
+      parts = team_name.split
+      parts.last || team_name
     end
 
     def extract_city(team_name)

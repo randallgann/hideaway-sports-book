@@ -2,6 +2,7 @@ module OddsApi
   class SportsSync
     DEFAULT_SPORTS = [
       "basketball_nba",
+      "basketball_ncaab",
       "americanfootball_nfl",
       "americanfootball_ncaaf"
     ].freeze

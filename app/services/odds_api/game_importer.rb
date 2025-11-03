@@ -56,7 +56,7 @@ module OddsApi
         new_game = Game.new(
           external_id: external_id,
           sport: sport,
-          data_source: "api",
+          data_source: "the_odds_api",
           status: "scheduled"
         )
         [new_game, true] # new game

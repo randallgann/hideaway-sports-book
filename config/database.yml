@@ -16,15 +16,25 @@ default: &default
   port: <%= ENV.fetch("POSTGRES_PORT") { 5433 } %>
 
 development:
-  <<: *default
-  database: hideaway_sports_book_db
+  primary:
+    <<: *default
+    database: hideaway_sports_book_db
+  queue:
+    <<: *default
+    database: hideaway_sports_book_db
+    migrations_paths: db/queue_migrate
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
-  <<: *default
-  database: hideaway_sports_book_test_db
+  primary:
+    <<: *default
+    database: hideaway_sports_book_test_db
+  queue:
+    <<: *default
+    database: hideaway_sports_book_test_db
+    migrations_paths: db/queue_migrate
 
 # For production, you might use a managed PostgreSQL service
 # Configure with environment variables

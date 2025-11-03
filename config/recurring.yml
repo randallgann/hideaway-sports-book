@@ -9,7 +9,47 @@
 #     priority: 2
 #     schedule: at 5am every day
 
+development:
+  # Sync live games every 15 minutes (less frequent in dev to conserve API requests)
+  sync_live_games:
+    class: SyncLiveGamesJob
+    queue: critical
+    schedule: every 15 minutes
+
+  # Sync upcoming games every 2 hours
+  sync_upcoming_games:
+    class: SyncUpcomingGamesJob
+    queue: default
+    schedule: every 2 hours
+
+  # Sync distant games once daily at 3am
+  sync_distant_games:
+    class: SyncDistantGamesJob
+    queue: background
+    schedule: every day at 3am
+    timezone: UTC
+
 production:
+  # Sync live games every 5 minutes for real-time odds
+  sync_live_games:
+    class: SyncLiveGamesJob
+    queue: critical
+    schedule: every 5 minutes
+
+  # Sync upcoming games every hour
+  sync_upcoming_games:
+    class: SyncUpcomingGamesJob
+    queue: default
+    schedule: every 1 hour
+
+  # Sync distant games once daily at 3am
+  sync_distant_games:
+    class: SyncDistantGamesJob
+    queue: background
+    schedule: every day at 3am
+    timezone: UTC
+
+  # Clean up finished jobs
   clear_solid_queue_finished_jobs:
     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
     schedule: every hour at minute 12

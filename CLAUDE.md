@@ -162,6 +162,8 @@ bin/rails generate migration MigrationName
 ```
 
 ### Odds API Integration
+
+**Manual Sync Commands:**
 ```bash
 # Sync odds from The Odds API for all sports (NBA, NFL, NCAAF)
 bin/rails odds:sync
@@ -172,6 +174,53 @@ bin/rails odds:sync_sport[basketball_nba]
 # List all available sports
 bin/rails odds:list_sports
 ```
+
+**Automated Sync System:**
+
+The application uses Solid Queue to automatically sync games and betting lines at different intervals based on game timing:
+
+- **Live Games** (within 1 hour of start): Synced every 5 minutes (15 minutes in development)
+  - Critical priority queue for real-time odds
+  - Includes games starting within 1 hour and games in progress (up to 4 hours old)
+
+- **Upcoming Games** (1-48 hours from now): Synced every 60 minutes (2 hours in development)
+  - Default priority queue for regular updates
+  - Balances API usage with data freshness
+
+- **Distant Games** (48+ hours from now): Synced once daily at 3am UTC
+  - Background priority queue for low-priority updates
+  - Minimal API usage for games far in the future
+
+**Job Classes:**
+- `SyncLiveGamesJob` - Handles live and imminent games
+- `SyncUpcomingGamesJob` - Handles upcoming games
+- `SyncDistantGamesJob` - Handles distant future games
+
+**Configuration:**
+- Recurring tasks defined in `config/recurring.yml`
+- Queue workers configured in `config/queue.yml`
+- Solid Queue uses PostgreSQL (no Redis required)
+
+**Testing Jobs Manually:**
+```bash
+# Run a sync job immediately in Rails console
+bin/rails c
+> SyncLiveGamesJob.perform_now
+> SyncUpcomingGamesJob.perform_now
+> SyncDistantGamesJob.perform_now
+
+# Check job status
+> SolidQueue::Job.pending.count
+> SolidQueue::Job.finished.count
+> SolidQueue::Job.failed.count
+```
+
+**Disabling Automated Sync in Development:**
+```bash
+# Set environment variable to skip recurring tasks
+SOLID_QUEUE_SKIP_RECURRING=true bin/rails server
+```
+
 **API Key**: Set `ODDS_API_KEY` in `.env` file. Service layer in `app/services/odds_api/` handles fetching, team matching, and importing games with live betting lines.
 
 ## Database Schema
@@ -191,6 +240,11 @@ The application has three core models representing a sportsbook system:
   - `has_many :betting_lines` (dependent: destroy)
 - Key concept: Games reference teams twice (home/away), using foreign keys `home_team_id` and `away_team_id`
 - API tracking: `external_id` (unique), `data_source` (defaults to "manual"), `last_synced_at`
+- Scopes for time-based filtering:
+  - `Game.live_window` - Games within 1 hour of start (including in progress)
+  - `Game.upcoming_window` - Games 1-48 hours from now
+  - `Game.distant_window` - Games more than 48 hours from now
+  - `Game.from_api` - Games with external_id (from API, not manual)
 
 ### BettingLines
 - Fields: `line_type`, `home_odds`, `away_odds`, `spread`, `total`, `over_odds`, `under_odds`
