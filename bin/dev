@@ -1,2 +1,4 @@
 #!/usr/bin/env ruby
-exec "./bin/rails", "server", *ARGV
+
+# Start both Rails server and Solid Queue worker using foreman
+exec "foreman", "start", "-f", "Procfile.dev"
