@@ -1,7 +1,7 @@
 class PaperTradingTransaction < ApplicationRecord
   belongs_to :paper_trading_account
 
-  TRANSACTION_TYPES = %w[charge refund].freeze
+  TRANSACTION_TYPES = %w[charge refund withdrawal].freeze
 
   validates :transaction_type, presence: true, inclusion: { in: TRANSACTION_TYPES }
   validates :amount, presence: true, numericality: { greater_than: 0 }
@@ -12,4 +12,5 @@ class PaperTradingTransaction < ApplicationRecord
 
   scope :charges, -> { where(transaction_type: 'charge') }
   scope :refunds, -> { where(transaction_type: 'refund') }
+  scope :withdrawals, -> { where(transaction_type: 'withdrawal') }
 end

@@ -31,6 +31,16 @@ module PaymentAdapters
       raise NotImplementedError, "#{self.class} must implement #refund"
     end
 
+    # Withdraw funds to customer (payout from bankroll)
+    # This is different from refund - refund reverses a charge, withdraw is a new payout
+    # @param amount [Numeric] Amount to withdraw in dollars
+    # @param currency [String] Currency code
+    # @param options [Hash] Additional options (customer_id, payment_method, metadata, etc.)
+    # @return [Hash] Withdrawal result with :success, :withdrawal_id, :amount, :message
+    def withdraw(amount, currency: 'USD', **options)
+      raise NotImplementedError, "#{self.class} must implement #withdraw"
+    end
+
     # Get customer's balance (relevant for paper trading, stored value accounts)
     # @param customer_id [String] Customer identifier
     # @return [Hash] Balance info with :balance, :currency
@@ -73,7 +83,7 @@ module PaymentAdapters
     # Override in subclasses to specify supported features
     # @return [Array<Symbol>] List of supported features
     def supported_features
-      [:charge, :refund, :balance, :customer_creation, :payment_validation]
+      [:charge, :refund, :withdraw, :balance, :customer_creation, :payment_validation]
     end
 
     # Validate adapter configuration

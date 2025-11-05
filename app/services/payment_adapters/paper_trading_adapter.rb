@@ -114,6 +114,55 @@ module PaymentAdapters
       error_response("Refund failed: #{e.message}")
     end
 
+    # Withdraw funds from paper trading account (payout)
+    # @param amount [Numeric] Amount to withdraw
+    # @param currency [String] Currency code
+    # @param options [Hash] Must include :customer_id
+    # @return [Hash] Withdrawal result
+    def withdraw(amount, currency: 'USD', **options)
+      validate_amount!(amount)
+      customer_id = options[:customer_id] || raise(ArgumentError, "customer_id is required")
+
+      # Find account
+      account = PaperTradingAccount.find_by!(customer_id: customer_id)
+
+      # Check sufficient funds
+      if account.balance < amount
+        return error_response(
+          "Insufficient funds for withdrawal. Balance: #{account.balance}, Requested: #{amount}",
+          balance: account.balance,
+          requested: amount
+        )
+      end
+
+      # Create withdrawal transaction
+      withdrawal_transaction = PaperTradingTransaction.create!(
+        paper_trading_account: account,
+        transaction_type: 'withdrawal',
+        amount: amount,
+        currency: currency,
+        transaction_id: generate_transaction_id,
+        metadata: options[:metadata] || {}
+      )
+
+      # Debit account
+      account.debit!(amount)
+
+      success_response(
+        withdrawal_id: withdrawal_transaction.transaction_id,
+        amount: amount,
+        currency: currency,
+        balance: account.reload.balance,
+        message: "Successfully withdrew #{amount} #{currency}"
+      )
+    rescue ActiveRecord::RecordNotFound
+      error_response("Account not found for customer #{customer_id}")
+    rescue InsufficientFundsError => e
+      error_response(e.message, balance: account&.balance)
+    rescue StandardError => e
+      error_response("Withdrawal failed: #{e.message}")
+    end
+
     # Get customer's paper trading balance
     # @param customer_id [String] Customer identifier
     # @return [Hash] Balance information

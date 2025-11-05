@@ -106,6 +106,41 @@ module PaymentAdapters
       error_response("PayPal refund failed: #{e.message}")
     end
 
+    # Withdraw funds to customer (payout via PayPal)
+    # @param amount [Numeric] Amount to withdraw
+    # @param currency [String] Currency code
+    # @param options [Hash] PayPal-specific options
+    # @return [Hash] Withdrawal result
+    def withdraw(amount, currency: 'USD', **options)
+      validate_amount!(amount)
+
+      # In production with PayPal Payouts API
+      # payout_params = {
+      #   sender_batch_header: {
+      #     sender_batch_id: "batch_#{SecureRandom.hex(8)}",
+      #     email_subject: "You have a payout!"
+      #   },
+      #   items: [{
+      #     recipient_type: 'EMAIL',
+      #     amount: { value: format_amount(amount), currency: currency },
+      #     receiver: options[:paypal_email],
+      #     note: 'Sportsbook withdrawal'
+      #   }]
+      # }
+      # payout = PayPal::Payout.create(payout_params)
+
+      # Mock response
+      success_response(
+        withdrawal_id: "paypal_payout_mock_#{SecureRandom.hex(12)}",
+        amount: amount,
+        currency: currency,
+        message: "PayPal payout would be processed here (mock response)",
+        note: "In production, would use PayPal Payouts API to send to user's PayPal email"
+      )
+    rescue StandardError => e
+      error_response("PayPal withdrawal failed: #{e.message}")
+    end
+
     # Get customer's PayPal balance
     # Note: PayPal doesn't directly expose customer balances via API
     # This method returns account verification status instead

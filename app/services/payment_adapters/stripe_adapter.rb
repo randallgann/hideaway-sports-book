@@ -105,6 +105,35 @@ module PaymentAdapters
       error_response("Stripe refund failed: #{e.message}")
     end
 
+    # Withdraw funds to customer (payout via Stripe)
+    # @param amount [Numeric] Amount to withdraw
+    # @param currency [String] Currency code
+    # @param options [Hash] Stripe-specific options
+    # @return [Hash] Withdrawal result
+    def withdraw(amount, currency: 'USD', **options)
+      validate_amount!(amount)
+      amount_cents = to_cents(amount)
+
+      # In production with Stripe, you'd use Stripe Payouts or Transfers
+      # payout_params = {
+      #   amount: amount_cents,
+      #   currency: currency.downcase,
+      #   destination: options[:bank_account] || options[:debit_card]
+      # }
+      # payout = Stripe::Payout.create(payout_params)
+
+      # Mock response
+      success_response(
+        withdrawal_id: "stripe_payout_mock_#{SecureRandom.hex(12)}",
+        amount: amount,
+        currency: currency,
+        message: "Stripe payout would be processed here (mock response)",
+        note: "In production, would create Stripe Payout to bank account or debit card"
+      )
+    rescue StandardError => e
+      error_response("Stripe withdrawal failed: #{e.message}")
+    end
+
     # Get customer's balance (Stripe customer balance for credits)
     # @param customer_id [String] Stripe customer ID
     # @return [Hash] Balance information
