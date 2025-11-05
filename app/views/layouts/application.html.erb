@@ -24,6 +24,32 @@
   </head>
 
   <body>
-    <%= yield %>
+    <header>
+      <nav>
+        <%= link_to "Hideaway Sports Book", root_path %>
+
+        <% if user_signed_in? %>
+          <span>Welcome, <%= current_user.name || current_user.email %>!</span>
+          <%= button_to "Sign Out", destroy_user_session_path, method: :delete %>
+        <% else %>
+          <%= link_to "Sign In", new_user_session_path %>
+          <%= link_to "Sign Up", new_user_registration_path %>
+          <%= link_to "Sign in with Google", user_google_oauth2_omniauth_authorize_path, method: :post %>
+          <%= link_to "Sign in with GitHub", user_github_omniauth_authorize_path, method: :post %>
+        <% end %>
+      </nav>
+    </header>
+
+    <% if notice %>
+      <div class="notice"><%= notice %></div>
+    <% end %>
+
+    <% if alert %>
+      <div class="alert"><%= alert %></div>
+    <% end %>
+
+    <main>
+      <%= yield %>
+    </main>
   </body>
 </html>
