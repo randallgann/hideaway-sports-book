@@ -31,3 +31,4 @@ All notable changes to this project will be documented in this file.
 - Fixed VS Code Ruby LSP workspace activation hanging by changing from `custom` to `rbenv` identifier in `.vscode/settings.json`
 - Fixed test route helper - changed from `games_index_url` to `games_url` in controller tests
 - Added `resources :games, only: [:index]` route to properly generate URL helpers
+- Fixed TeamMatcher fuzzy matching causing incorrect team assignments (e.g., "Boston College Eagles" was incorrectly matched to "Georgia Southern Eagles"). Removed substring matching and now uses exact match only.
