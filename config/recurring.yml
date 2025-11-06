@@ -10,6 +10,13 @@
 #     schedule: at 5am every day
 
 development:
+  # Bootstrap: Sync ALL sports twice daily to discover new games
+  sync_all_sports:
+    class: SyncAllSportsJob
+    queue: default
+    schedule: every day at 6am, 6pm
+    timezone: UTC
+
   # Sync live games every 15 minutes (less frequent in dev to conserve API requests)
   sync_live_games:
     class: SyncLiveGamesJob
@@ -30,6 +37,13 @@ development:
     timezone: UTC
 
 production:
+  # Bootstrap: Sync ALL sports twice daily to discover new games
+  sync_all_sports:
+    class: SyncAllSportsJob
+    queue: default
+    schedule: every day at 6am, 6pm
+    timezone: UTC
+
   # Sync live games every 5 minutes for real-time odds
   sync_live_games:
     class: SyncLiveGamesJob

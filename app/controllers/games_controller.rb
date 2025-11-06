@@ -2,11 +2,12 @@ class GamesController < ApplicationController
   def index
     # Fetch games from API only (exclude seed data)
     # .includes() prevents N+1 queries by loading associations in advance
-    # .where() filters to only API-sourced games
+    # .where() filters to only API-sourced games and upcoming/live games
     # .order() sorts games by time (earliest first)
     # .group_by() organizes games by sport for collapsible sections
     games = Game.includes(:home_team, :away_team, :betting_lines)
                 .where(data_source: "the_odds_api")
+                .where("game_time >= ?", 4.hours.ago)
                 .order(:game_time)
 
     # Group games by sport and sort sports alphabetically

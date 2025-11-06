@@ -90,9 +90,19 @@ git push -u origin feature/my-feature
 
 ### Development Server
 ```bash
-bin/rails server
+# Start both Rails server AND Solid Queue worker (RECOMMENDED)
+bin/dev
 # Server runs on http://localhost:3000
+# This starts both the web server and background job worker
+
+# Alternative: Start only Rails server (background jobs won't run)
+bin/rails server
+
+# Alternative: Start only Solid Queue worker (if server already running)
+bin/jobs
 ```
+
+**IMPORTANT**: Use `bin/dev` to ensure background jobs run automatically. The automated sync system requires the Solid Queue worker to be running.
 
 ### Database Management
 ```bash
@@ -177,24 +187,33 @@ bin/rails odds:list_sports
 
 **Automated Sync System:**
 
-The application uses Solid Queue to automatically sync games and betting lines at different intervals based on game timing:
+The application uses Solid Queue to automatically sync games and betting lines at different intervals:
+
+- **Bootstrap Sync** (ALL sports): Synced twice daily at 6am and 6pm UTC
+  - Syncs ALL configured sports (NBA, NCAAB, NFL, NCAAF) regardless of what's in database
+  - Discovers new games and ensures database never stays empty
+  - This is the job that initially populates your database
 
 - **Live Games** (within 1 hour of start): Synced every 5 minutes (15 minutes in development)
   - Critical priority queue for real-time odds
+  - Only syncs sports with games in the live window
   - Includes games starting within 1 hour and games in progress (up to 4 hours old)
 
 - **Upcoming Games** (1-48 hours from now): Synced every 60 minutes (2 hours in development)
   - Default priority queue for regular updates
+  - Only syncs sports with games in the upcoming window
   - Balances API usage with data freshness
 
 - **Distant Games** (48+ hours from now): Synced once daily at 3am UTC
   - Background priority queue for low-priority updates
+  - Only syncs sports with games in the distant window
   - Minimal API usage for games far in the future
 
 **Job Classes:**
-- `SyncLiveGamesJob` - Handles live and imminent games
-- `SyncUpcomingGamesJob` - Handles upcoming games
-- `SyncDistantGamesJob` - Handles distant future games
+- `SyncAllSportsJob` - Bootstrap job that syncs ALL configured sports (runs twice daily)
+- `SyncLiveGamesJob` - Handles live and imminent games (only syncs if games exist)
+- `SyncUpcomingGamesJob` - Handles upcoming games (only syncs if games exist)
+- `SyncDistantGamesJob` - Handles distant future games (only syncs if games exist)
 
 **Configuration:**
 - Recurring tasks defined in `config/recurring.yml`
@@ -205,14 +224,29 @@ The application uses Solid Queue to automatically sync games and betting lines a
 ```bash
 # Run a sync job immediately in Rails console
 bin/rails c
-> SyncLiveGamesJob.perform_now
-> SyncUpcomingGamesJob.perform_now
-> SyncDistantGamesJob.perform_now
+> SyncAllSportsJob.perform_now      # Bootstrap - syncs ALL sports
+> SyncLiveGamesJob.perform_now      # Only syncs if live games exist
+> SyncUpcomingGamesJob.perform_now  # Only syncs if upcoming games exist
+> SyncDistantGamesJob.perform_now   # Only syncs if distant games exist
 
 # Check job status
-> SolidQueue::Job.pending.count
-> SolidQueue::Job.finished.count
-> SolidQueue::Job.failed.count
+> SolidQueue::Job.count
+> SolidQueue::Job.order(created_at: :desc).limit(5)
+> SolidQueue::Job.where(finished_at: nil).count  # Pending jobs
+
+# Check recurring tasks (should show 3 tasks when worker is running)
+> SolidQueue::RecurringTask.count
+> SolidQueue::RecurringTask.all.each { |t| puts "#{t.key}: #{t.schedule}" }
+```
+
+**Checking Worker Status:**
+```bash
+# Check if Solid Queue worker is running
+ps aux | grep "solid_queue"
+
+# Or check from Rails console
+bin/rails c
+> SolidQueue::Process.count  # Should be > 0 if worker is running
 ```
 
 **Disabling Automated Sync in Development:**
