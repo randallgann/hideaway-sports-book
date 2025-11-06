@@ -31,16 +31,14 @@ module OddsApi
       # Normalize the search term
       normalized_name = normalize_name(team_name)
 
-      # Try exact match first
+      # Use exact match only to prevent incorrect fuzzy matches
+      # Example: "Boston College Eagles" should NOT match "Georgia Southern Eagles"
       teams = Team.where(sport: sport)
 
-      # Find teams where the normalized full name matches
+      # Find teams where the normalized full name matches exactly
       teams.find do |team|
         full_name = "#{team.city} #{team.name}".strip
-        normalize_name(full_name) == normalized_name ||
-          normalize_name(team.name) == normalized_name ||
-          normalized_name.include?(normalize_name(team.name)) ||
-          normalize_name(full_name).include?(normalized_name)
+        normalize_name(full_name) == normalized_name
       end
     end
 
