@@ -10,9 +10,39 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_01_161715) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_06_005619) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "bankroll_transactions", force: :cascade do |t|
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.decimal "balance_after", precision: 10, scale: 2, null: false
+    t.decimal "balance_before", precision: 10, scale: 2, null: false
+    t.bigint "bankroll_id", null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.text "metadata"
+    t.string "payment_transaction_id"
+    t.string "reference_id"
+    t.string "transaction_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["bankroll_id"], name: "index_bankroll_transactions_on_bankroll_id"
+    t.index ["created_at"], name: "index_bankroll_transactions_on_created_at"
+    t.index ["payment_transaction_id"], name: "index_bankroll_transactions_on_payment_transaction_id"
+    t.index ["reference_id"], name: "index_bankroll_transactions_on_reference_id"
+    t.index ["transaction_type"], name: "index_bankroll_transactions_on_transaction_type"
+  end
+
+  create_table "bankrolls", force: :cascade do |t|
+    t.decimal "available_balance", precision: 10, scale: 2, default: "0.0", null: false
+    t.datetime "created_at", null: false
+    t.string "currency", default: "USD", null: false
+    t.decimal "locked_balance", precision: 10, scale: 2, default: "0.0", null: false
+    t.string "payment_processor", default: "paper_trading", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_bankrolls_on_user_id", unique: true
+  end
 
   create_table "betting_lines", force: :cascade do |t|
     t.decimal "away_odds", precision: 8, scale: 2
@@ -58,6 +88,17 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_01_161715) do
     t.index ["external_id"], name: "index_teams_on_external_id", unique: true
   end
 
+  create_table "users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.datetime "updated_at", null: false
+    t.string "username"
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["username"], name: "index_users_on_username", unique: true
+  end
+
+  add_foreign_key "bankroll_transactions", "bankrolls"
+  add_foreign_key "bankrolls", "users"
   add_foreign_key "betting_lines", "games"
   add_foreign_key "games", "teams", column: "away_team_id"
   add_foreign_key "games", "teams", column: "home_team_id"

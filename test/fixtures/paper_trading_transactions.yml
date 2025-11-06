@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  paper_trading_account: one
+  transaction_type: deposit
+  amount: 100.00
+  currency: USD
+  transaction_id: txn_001
+  metadata: Test deposit transaction
+
+two:
+  paper_trading_account: two
+  transaction_type: withdrawal
+  amount: 50.00
+  currency: USD
+  transaction_id: txn_002
+  metadata: Test withdrawal transaction

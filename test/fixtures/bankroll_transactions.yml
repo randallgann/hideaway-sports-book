@@ -1,0 +1,23 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  bankroll: one
+  transaction_type: deposit
+  amount: 100.00
+  balance_before: 900.00
+  balance_after: 1000.00
+  reference_id: ref_001
+  payment_transaction_id: pay_txn_001
+  description: Initial deposit
+  metadata: '{"source": "paper_trading"}'
+
+two:
+  bankroll: two
+  transaction_type: withdrawal
+  amount: 50.00
+  balance_before: 600.00
+  balance_after: 550.00
+  reference_id: ref_002
+  payment_transaction_id: pay_txn_002
+  description: Test withdrawal
+  metadata: '{"source": "paper_trading"}'
