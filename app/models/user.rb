@@ -5,8 +5,16 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable,
          :omniauthable, omniauth_providers: [:google_oauth2, :github]
 
-  # Allow blank email for OAuth users
-  validates :email, presence: true, if: -> { provider.blank? }
+
+  # Associations
+  has_one :bankroll, dependent: :destroy
+
+  # Validations
+  validates :username, uniqueness: true, allow_nil: true
+  validates :email, uniqueness: true, if: -> { provider.blank? }
+
+  # Callback to create bankroll when user is created
+  after_create :create_default_bankroll
 
   # Create or find user from OmniAuth data
   def self.from_omniauth(auth)
@@ -16,13 +24,7 @@ class User < ApplicationRecord
       user.name = auth.info.name
       user.username = auth.info.nickname || auth.info.name&.parameterize
     end
-  has_one :bankroll, dependent: :destroy
-
-  validates :username, presence: true, uniqueness: true
-  validates :email, uniqueness: true, allow_nil: true
-
-  # Callback to create bankroll when user is created
-  after_create :create_default_bankroll
+  end
 
   # Human-readable identifier (username or email)
   def identifier

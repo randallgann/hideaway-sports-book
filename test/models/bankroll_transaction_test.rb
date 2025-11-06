@@ -2,7 +2,12 @@ require "test_helper"
 
 class BankrollTransactionTest < ActiveSupport::TestCase
   def setup
-    @user = User.create!(username: "testuser")
+    @user = User.create!(
+      username: "testuser",
+      email: "testuser@example.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
     @bankroll = @user.bankroll
     @bankroll.update!(available_balance: 100.00)
   end
