@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  available_balance: 1000.00
+  locked_balance: 0.00
+  currency: USD
+  payment_processor: paper_trading
+
+two:
+  user: two
+  available_balance: 500.00
+  locked_balance: 50.00
+  currency: USD
+  payment_processor: paper_trading
