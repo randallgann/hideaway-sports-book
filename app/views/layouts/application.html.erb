@@ -24,32 +24,36 @@
   </head>
 
   <body>
-    <header>
-      <nav>
-        <%= link_to "Hideaway Sports Book", root_path %>
+    <header class="navbar">
+      <nav class="nav-container">
+        <div class="nav-brand">
+          <%= link_to "Hideaway Sports Book", root_path, class: "brand-link" %>
+        </div>
 
-        <% if user_signed_in? %>
-          <span>Welcome, <%= current_user.name || current_user.email %>!</span>
-          <%= button_to "Sign Out", destroy_user_session_path, method: :delete %>
-        <% else %>
-          <%= link_to "Sign In", new_user_session_path %>
-          <%= link_to "Sign Up", new_user_registration_path %>
-          <%= link_to "Sign in with Google", user_google_oauth2_omniauth_authorize_path, method: :post %>
-          <%= link_to "Sign in with GitHub", user_github_omniauth_authorize_path, method: :post %>
-        <% end %>
+        <div class="nav-actions">
+          <% if user_signed_in? %>
+            <span class="welcome-text">Welcome, <%= current_user.name || current_user.email %>!</span>
+            <%= button_to "Sign Out", destroy_user_session_path, method: :delete, class: "btn btn-secondary" %>
+          <% else %>
+            <%= link_to "Sign In", new_user_session_path, class: "btn btn-primary" %>
+            <%= link_to "Sign Up", new_user_registration_path, class: "btn btn-secondary" %>
+          <% end %>
+        </div>
       </nav>
     </header>
 
-    <% if notice %>
-      <div class="notice"><%= notice %></div>
-    <% end %>
+    <div class="container">
+      <% if notice %>
+        <div class="alert alert-success"><%= notice %></div>
+      <% end %>
 
-    <% if alert %>
-      <div class="alert"><%= alert %></div>
-    <% end %>
+      <% if alert %>
+        <div class="alert alert-danger"><%= alert %></div>
+      <% end %>
 
-    <main>
-      <%= yield %>
-    </main>
+      <main>
+        <%= yield %>
+      </main>
+    </div>
   </body>
 </html>
