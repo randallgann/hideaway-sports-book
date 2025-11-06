@@ -83,23 +83,25 @@ class PaymentAdapters::PaperTradingAdapterTest < ActiveSupport::TestCase
     assert_includes result[:message], "not found"
   end
 
-  test "withdraw deducts from balance" do
-    # First charge to add funds
+  test "withdraw adds to balance (payout to customer)" do
+    # First charge to create account and take initial payment
     @adapter.charge(100.00, customer_id: @customer_id)
+    # Balance after charge: 1000 - 100 = 900
 
-    # Then withdraw
+    # Then withdraw (payout winnings back to customer)
     result = @adapter.withdraw(50.00, customer_id: @customer_id)
 
     assert result[:success]
     assert_equal 50.00, result[:amount]
-    assert_equal 850.00, result[:balance] # 1000 - 100 + 50 = 950, then 950 - 50 = 900
+    assert_equal 950.00, result[:balance] # 900 + 50 (payout) = 950
   end
 
-  test "withdraw with insufficient balance fails" do
-    result = @adapter.withdraw(1500.00, customer_id: @customer_id)
+  test "withdraw without existing account fails" do
+    # Try to withdraw to non-existent account
+    result = @adapter.withdraw(50.00, customer_id: @customer_id)
 
     assert_not result[:success]
-    assert_includes result[:message], "Insufficient funds"
+    assert_includes result[:message], "No payment account found"
   end
 
   test "withdraw without customer_id fails" do

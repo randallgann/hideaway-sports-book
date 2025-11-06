@@ -73,7 +73,8 @@ class BankrollTest < ActiveSupport::TestCase
 
   # Withdrawal tests
   test "withdraw deducts from available balance" do
-    @bankroll.update!(available_balance: 100.00)
+    # First deposit to create payment account and add funds
+    @bankroll.deposit(100.00)
 
     result = @bankroll.withdraw(50.00)
 
@@ -82,7 +83,8 @@ class BankrollTest < ActiveSupport::TestCase
   end
 
   test "withdraw fails with insufficient balance" do
-    @bankroll.update!(available_balance: 10.00)
+    # Deposit a small amount
+    @bankroll.deposit(10.00)
 
     result = @bankroll.withdraw(50.00)
 
@@ -91,7 +93,8 @@ class BankrollTest < ActiveSupport::TestCase
   end
 
   test "withdraw fails with amount below minimum" do
-    @bankroll.update!(available_balance: 100.00)
+    # Deposit to create payment account
+    @bankroll.deposit(100.00)
 
     result = @bankroll.withdraw(15.00) # Below MIN_WITHDRAWAL of 20.00
 
@@ -100,10 +103,11 @@ class BankrollTest < ActiveSupport::TestCase
   end
 
   test "withdraw creates bankroll transaction" do
-    @bankroll.update!(available_balance: 100.00)
+    # Deposit to create payment account
+    @bankroll.deposit(100.00)
     @bankroll.withdraw(50.00)
 
-    transaction = @bankroll.bankroll_transactions.last
+    transaction = @bankroll.bankroll_transactions.where(transaction_type: 'withdrawal').last
     assert_equal 'withdrawal', transaction.transaction_type
     assert_equal 50.00, transaction.amount
     assert_equal 100.00, transaction.balance_before

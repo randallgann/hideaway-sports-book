@@ -16,8 +16,10 @@ module PaymentAdapters
     # @param options [Hash] Must include :customer_id
     # @return [Hash] Payment result
     def charge(amount, currency: 'USD', **options)
+      # Validate inputs first (let ArgumentError bubble up)
       validate_amount!(amount)
-      customer_id = options[:customer_id] || raise(ArgumentError, "customer_id is required")
+      customer_id = options[:customer_id]
+      raise ArgumentError, "customer_id is required" unless customer_id
 
       # Find or create account
       account = PaperTradingAccount.find_or_create_for_customer(
@@ -55,6 +57,8 @@ module PaymentAdapters
         balance: account.reload.balance,
         message: "Successfully charged #{amount} #{currency}"
       )
+    rescue ArgumentError
+      raise  # Let ArgumentError bubble up for caller to handle
     rescue InsufficientFundsError => e
       error_response(e.message, balance: account&.balance)
     rescue StandardError => e
@@ -120,22 +124,18 @@ module PaymentAdapters
     # @param options [Hash] Must include :customer_id
     # @return [Hash] Withdrawal result
     def withdraw(amount, currency: 'USD', **options)
+      # Validate inputs first (let ArgumentError bubble up)
       validate_amount!(amount)
-      customer_id = options[:customer_id] || raise(ArgumentError, "customer_id is required")
+      customer_id = options[:customer_id]
+      raise ArgumentError, "customer_id is required" unless customer_id
 
-      # Find account
-      account = PaperTradingAccount.find_by!(customer_id: customer_id)
-
-      # Check sufficient funds
-      if account.balance < amount
-        return error_response(
-          "Insufficient funds for withdrawal. Balance: #{account.balance}, Requested: #{amount}",
-          balance: account.balance,
-          requested: amount
-        )
+      # Find existing account (must exist - can't withdraw to non-existent account)
+      account = PaperTradingAccount.find_by(customer_id: customer_id)
+      unless account
+        return error_response("No payment account found for customer #{customer_id}. Please make a deposit first.")
       end
 
-      # Create withdrawal transaction
+      # Create withdrawal transaction (payout to customer)
       withdrawal_transaction = PaperTradingTransaction.create!(
         paper_trading_account: account,
         transaction_type: 'withdrawal',
@@ -145,8 +145,8 @@ module PaymentAdapters
         metadata: options[:metadata] || {}
       )
 
-      # Debit account
-      account.debit!(amount)
+      # Credit account (withdrawal is a payout, adds money to external account)
+      account.credit!(amount)
 
       success_response(
         withdrawal_id: withdrawal_transaction.transaction_id,
@@ -155,8 +155,8 @@ module PaymentAdapters
         balance: account.reload.balance,
         message: "Successfully withdrew #{amount} #{currency}"
       )
-    rescue ActiveRecord::RecordNotFound
-      error_response("Account not found for customer #{customer_id}")
+    rescue ArgumentError
+      raise  # Let ArgumentError bubble up for caller to handle
     rescue InsufficientFundsError => e
       error_response(e.message, balance: account&.balance)
     rescue StandardError => e
@@ -217,7 +217,7 @@ module PaymentAdapters
     protected
 
     def supported_features
-      [:charge, :refund, :balance, :customer_creation, :instant_settlement, :zero_fees]
+      [:charge, :refund, :withdraw, :balance, :customer_creation, :instant_settlement, :zero_fees]
     end
 
     def validate_configuration!
