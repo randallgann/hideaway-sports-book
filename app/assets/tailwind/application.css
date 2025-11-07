@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+/* Custom Theme Configuration */
+@theme {
+  /* Custom colors from our brand */
+  --color-brand-green: #4CAF50;
+  --color-brand-green-dark: #45a049;
+  --color-dark-navy: #1a1a2e;
+  --color-gray-bg: #f8f9fa;
+
+  /* Extend default Tailwind colors */
+  --color-primary-500: #4CAF50;
+  --color-primary-600: #45a049;
+  --color-primary-700: #3d8b40;
+
+  /* Spacing and typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Base styles */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  @apply bg-gray-50 text-gray-800;
+}
+
+/* Custom component styles that are harder to do with utilities */
+.btn-oauth {
+  @apply flex items-center justify-center gap-2 px-6 py-3 w-full mt-3 bg-white text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all;
+}
+
+.btn-oauth.google {
+  @apply border-blue-500 hover:bg-blue-500 hover:text-white;
+}
+
+.btn-oauth.github {
+  @apply border-gray-800 hover:bg-gray-800 hover:text-white;
+}
+
+.oauth-divider {
+  @apply text-center my-6 relative;
+}
+
+.oauth-divider::before {
+  content: '';
+  @apply absolute top-1/2 left-0 right-0 h-px bg-gray-300;
+}
+
+.oauth-divider span {
+  @apply bg-white px-4 relative text-gray-600 text-sm;
+}

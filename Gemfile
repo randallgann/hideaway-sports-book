@@ -4,6 +4,8 @@ source "https://rubygems.org"
 gem "rails", "~> 8.1.0"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
+# Use Tailwind CSS [https://github.com/rails/tailwindcss-rails]
+gem "tailwindcss-rails"
 # Use PostgreSQL as the database for Active Record
 gem "pg", "~> 1.5"
 # Use the Puma web server [https://github.com/puma/puma]

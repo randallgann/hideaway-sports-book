@@ -23,32 +23,67 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <header class="navbar">
-      <nav class="nav-container">
-        <div class="nav-brand">
-          <%= link_to "Hideaway Sports Book", root_path, class: "brand-link" %>
+  <body class="min-h-screen">
+    <!-- Mobile-first responsive navbar -->
+    <header class="bg-[#1a1a2e] shadow-md sticky top-0 z-50">
+      <nav class="mx-auto" style="padding-left: 1.25rem; padding-right: 1.25rem; max-width: 100%;" data-controller="mobile-menu">
+        <div class="flex justify-between items-center" style="height: 4rem; padding-left: 0.5rem; padding-right: 0.5rem;">
+          <!-- Brand/Logo with better spacing -->
+          <div class="flex-shrink-0 py-2">
+            <%= link_to "Hideaway Sports Book", root_path, class: "text-white text-lg sm:text-xl md:text-2xl font-bold hover:text-[#4CAF50] transition-colors duration-200" %>
+          </div>
+
+          <!-- Mobile menu button with proper padding -->
+          <div class="md:hidden flex items-center">
+            <button type="button" data-action="click->mobile-menu#toggle" class="text-white hover:text-[#4CAF50] focus:outline-none focus:ring-2 focus:ring-[#4CAF50] rounded-lg p-2">
+              <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Desktop navigation with better spacing -->
+          <div class="hidden md:flex md:items-center md:gap-3 lg:gap-4">
+            <% if user_signed_in? %>
+              <span class="text-white text-sm mr-2 hidden lg:inline">Welcome, <%= current_user.name || current_user.email %>!</span>
+              <%= button_to "Sign Out", destroy_user_session_path, method: :delete, class: "px-5 py-2.5 text-sm font-semibold text-white border-2 border-[#4CAF50] rounded-lg hover:bg-[#4CAF50] transition-all duration-200" %>
+            <% else %>
+              <%= link_to "Sign In", new_user_session_path, class: "px-5 py-2.5 text-sm font-semibold text-white bg-[#4CAF50] rounded-lg hover:bg-[#45a049] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#4CAF50]/30 transition-all duration-200" %>
+              <%= link_to "Sign Up", new_user_registration_path, class: "px-5 py-2.5 text-sm font-semibold text-white border-2 border-[#4CAF50] rounded-lg hover:bg-[#4CAF50] hover:-translate-y-0.5 transition-all duration-200" %>
+            <% end %>
+          </div>
         </div>
 
-        <div class="nav-actions">
-          <% if user_signed_in? %>
-            <span class="welcome-text">Welcome, <%= current_user.name || current_user.email %>!</span>
-            <%= button_to "Sign Out", destroy_user_session_path, method: :delete, class: "btn btn-secondary" %>
-          <% else %>
-            <%= link_to "Sign In", new_user_session_path, class: "btn btn-primary" %>
-            <%= link_to "Sign Up", new_user_registration_path, class: "btn btn-secondary" %>
-          <% end %>
+        <!-- Mobile menu (hidden by default) with better padding -->
+        <div class="md:hidden hidden" data-mobile-menu-target="menu">
+          <div class="px-4 pt-4 pb-4 border-t border-gray-700" style="margin-top: 0.5rem;">
+            <% if user_signed_in? %>
+              <div class="text-white text-sm px-4 py-3 bg-gray-800 rounded-lg" style="margin-bottom: 1rem;">
+                Welcome, <%= current_user.name || current_user.email %>!
+              </div>
+              <%= button_to "Sign Out", destroy_user_session_path, method: :delete, class: "w-full px-4 py-3 text-sm font-semibold text-white border-2 border-[#4CAF50] rounded-lg hover:bg-[#4CAF50] transition-all duration-200 text-center" %>
+            <% else %>
+              <%= link_to "Sign In", new_user_session_path, class: "block w-full px-4 py-3 text-sm font-semibold text-center text-white bg-[#4CAF50] rounded-lg hover:bg-[#45a049] transition-all duration-200", style: "margin-bottom: 1rem;" %>
+              <%= link_to "Sign Up", new_user_registration_path, class: "block w-full px-4 py-3 text-sm font-semibold text-center text-white border-2 border-[#4CAF50] rounded-lg hover:bg-[#4CAF50] transition-all duration-200" %>
+            <% end %>
+          </div>
         </div>
       </nav>
     </header>
 
-    <div class="container">
+    <!-- Main content container with mobile-first padding -->
+    <div class="mx-auto" style="padding-left: 1rem; padding-right: 1rem; padding-top: 1.5rem; padding-bottom: 2rem; max-width: 100%;">
+      <!-- Flash messages with mobile-first design -->
       <% if notice %>
-        <div class="alert alert-success"><%= notice %></div>
+        <div class="p-3 sm:p-4 bg-green-50 border-l-4 border-green-500 text-green-800 rounded-lg shadow-sm" style="margin-bottom: 1.5rem;">
+          <%= notice %>
+        </div>
       <% end %>
 
       <% if alert %>
-        <div class="alert alert-danger"><%= alert %></div>
+        <div class="p-3 sm:p-4 bg-red-50 border-l-4 border-red-500 text-red-800 rounded-lg shadow-sm" style="margin-bottom: 1.5rem;">
+          <%= alert %>
+        </div>
       <% end %>
 
       <main>
