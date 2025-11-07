@@ -6,6 +6,17 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
+  # Configure custom log location with clean formatting
+  log_file = Rails.root.join("logs", "hideaway_sports_book", "test.log")
+  logger = ActiveSupport::Logger.new(log_file, 1, 50.megabytes)
+  logger.formatter = proc do |severity, datetime, progname, msg|
+    "[#{datetime.strftime('%Y-%m-%d %H:%M:%S')}] #{severity} -- #{msg}\n"
+  end
+  config.logger = ActiveSupport::TaggedLogging.new(logger)
+
+  # Disable colorized logging (removes ANSI codes)
+  config.colorize_logging = false
+
   # While tests run files are not watched, reloading is not necessary.
   config.enable_reloading = false
 

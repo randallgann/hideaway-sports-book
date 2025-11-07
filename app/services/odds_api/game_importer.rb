@@ -10,9 +10,22 @@ module OddsApi
     # @return [Game, Hash] The game and optionally stats hash
     def import_event(event_data, track_stats: false)
       game, was_new = find_or_create_game(event_data)
-      update_game_details(game, event_data)
-      import_betting_lines(game, event_data["bookmakers"] || [])
-      game.update!(last_synced_at: Time.current)
+
+      begin
+        update_game_details(game, event_data)
+        import_betting_lines(game, event_data["bookmakers"] || [])
+        game.update!(last_synced_at: Time.current)
+      rescue ActiveRecord::RecordNotUnique => e
+        # Race condition: another process created the game between our find and save
+        Rails.logger.warn("GameImporter: Duplicate key detected for event #{event_data['id']}, loading existing game")
+        # Find the existing game and update it instead
+        game = Game.find_by!(external_id: event_data["id"])
+        was_new = false
+        # Update the existing game
+        update_game_details(game, event_data)
+        import_betting_lines(game, event_data["bookmakers"] || [])
+        game.update!(last_synced_at: Time.current)
+      end
 
       if track_stats
         return game, { created: was_new, updated: !was_new }
@@ -25,6 +38,7 @@ module OddsApi
     # @param events [Array<Hash>] Array of event data from The Odds API
     # @return [Hash] Statistics about the import
     def import_events(events)
+      Rails.logger.info("GameImporter: Importing #{events.length} events")
       stats = { games_created: 0, games_updated: 0, errors: [] }
 
       events.each do |event_data|
@@ -33,10 +47,12 @@ module OddsApi
           stats[:games_created] += 1 if event_stats[:created]
           stats[:games_updated] += 1 if event_stats[:updated]
         rescue => e
+          Rails.logger.error("GameImporter: Failed to import event #{event_data['id']} - #{e.class}: #{e.message}")
           stats[:errors] << { event_id: event_data["id"], error: e.message }
         end
       end
 
+      Rails.logger.info("GameImporter: Import complete - Created: #{stats[:games_created]}, Updated: #{stats[:games_updated]}, Errors: #{stats[:errors].length}")
       stats
     end
 

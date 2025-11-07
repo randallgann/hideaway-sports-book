@@ -13,9 +13,9 @@ class GamesController < ApplicationController
     # Group games by sport and sort sports alphabetically
     @games_by_sport = games.group_by(&:sport).sort.to_h
 
-    # Get last sync times for each window
-    @last_live_sync = Game.last_live_sync
-    @last_upcoming_sync = Game.last_upcoming_sync
-    @last_distant_sync = Game.last_distant_sync
+    # Get last execution times for each sync job
+    @last_live_sync = JobExecution.last_execution_time('SyncLiveGamesJob')
+    @last_upcoming_sync = JobExecution.last_execution_time('SyncUpcomingGamesJob')
+    @last_distant_sync = JobExecution.last_execution_time('SyncDistantGamesJob')
   end
 end

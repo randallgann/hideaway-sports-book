@@ -33,9 +33,17 @@ Rails.application.configure do
   # Skip http-to-https redirect for the default health check endpoint.
   # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
 
-  # Log to STDOUT with the current request id as a default log tag.
+  # Log to custom directory with the current request id as a default log tag.
   config.log_tags = [ :request_id ]
-  config.logger   = ActiveSupport::TaggedLogging.logger(STDOUT)
+  log_file = Rails.root.join("logs", "hideaway_sports_book", "production.log")
+  logger = ActiveSupport::Logger.new(log_file, 1, 100.megabytes)
+  logger.formatter = proc do |severity, datetime, progname, msg|
+    "[#{datetime.strftime('%Y-%m-%d %H:%M:%S')}] #{severity} -- #{msg}\n"
+  end
+  config.logger = ActiveSupport::TaggedLogging.new(logger)
+
+  # Disable colorized logging (removes ANSI codes)
+  config.colorize_logging = false
 
   # Change to "debug" to log everything (including potentially personally-identifiable information!).
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")

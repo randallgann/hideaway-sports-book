@@ -26,8 +26,11 @@ module OddsApi
     # Fetch list of available sports
     # Returns an array of sport objects
     def fetch_sports
+      Rails.logger.info("OddsAPI: Fetching available sports")
       response = make_request(sports_url, {})
-      parse_response(response)
+      result = parse_response(response)
+      Rails.logger.info("OddsAPI: Retrieved #{result.length} sports")
+      result
     end
 
     # Fetch odds for a specific sport
@@ -37,6 +40,8 @@ module OddsApi
     # @param odds_format [String] Format for odds (default: "american")
     # Returns an array of event objects with odds
     def fetch_odds(sport, regions: ["us"], markets: ["h2h", "spreads", "totals"], odds_format: "american")
+      Rails.logger.info("OddsAPI: Fetching odds for #{sport} (regions: #{regions.join(',')}, markets: #{markets.join(',')})")
+
       params = {
         regions: regions.join(','),
         markets: markets.join(','),
@@ -44,7 +49,10 @@ module OddsApi
       }
 
       response = make_request(odds_url(sport), params)
-      parse_response(response)
+      result = parse_response(response)
+
+      Rails.logger.info("OddsAPI: Retrieved #{result.length} events for #{sport} (API requests remaining: #{@requests_remaining})")
+      result
     end
 
     private
@@ -65,6 +73,7 @@ module OddsApi
         update_rate_limit_info(response.headers)
         response
       rescue Net::OpenTimeout, Net::ReadTimeout => e
+        Rails.logger.error("OddsAPI: Request timed out for #{endpoint}")
         raise TimeoutError, "Request timed out"
       end
     end
@@ -75,14 +84,18 @@ module OddsApi
         JSON.parse(response.body)
       when 401
         error_message = parse_error_message(response)
+        Rails.logger.error("OddsAPI: Unauthorized - Invalid API key: #{error_message}")
         raise UnauthorizedError, "Invalid API key: #{error_message}"
       when 404
         error_message = parse_error_message(response)
+        Rails.logger.error("OddsAPI: Not Found - #{error_message}")
         raise NotFoundError, "Sport not found: #{error_message}"
       when 429
         error_message = parse_error_message(response)
+        Rails.logger.error("OddsAPI: Rate limit exceeded - #{error_message}")
         raise RateLimitError, "Rate limit exceeded: #{error_message}"
       else
+        Rails.logger.error("OddsAPI: API error #{response.code} - #{response.body}")
         raise ApiError, "API returned error: #{response.code} - #{response.body}"
       end
     end

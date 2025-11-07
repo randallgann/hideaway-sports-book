@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_06_014926) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_07_165544) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -74,6 +74,16 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_06_014926) do
     t.index ["away_team_id"], name: "index_games_on_away_team_id"
     t.index ["external_id"], name: "index_games_on_external_id", unique: true
     t.index ["home_team_id"], name: "index_games_on_home_team_id"
+  end
+
+  create_table "job_executions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "executed_at", null: false
+    t.string "job_name", null: false
+    t.string "status"
+    t.datetime "updated_at", null: false
+    t.index ["job_name", "executed_at"], name: "index_job_executions_on_job_name_and_executed_at"
+    t.index ["job_name"], name: "index_job_executions_on_job_name"
   end
 
   create_table "paper_trading_accounts", force: :cascade do |t|

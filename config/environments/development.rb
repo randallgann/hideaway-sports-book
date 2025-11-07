@@ -3,6 +3,20 @@ require "active_support/core_ext/integer/time"
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
+  # Configure custom log location with clean formatting
+  log_file = Rails.root.join("logs", "hideaway_sports_book", "development.log")
+  logger = ActiveSupport::Logger.new(log_file, 1, 50.megabytes)
+  logger.formatter = proc do |severity, datetime, progname, msg|
+    "[#{datetime.strftime('%Y-%m-%d %H:%M:%S')}] #{severity} -- #{msg}\n"
+  end
+  config.logger = ActiveSupport::TaggedLogging.new(logger)
+
+  # Disable colorized logging (removes ANSI codes)
+  config.colorize_logging = false
+
+  # Set log level to :info to reduce verbosity (change to :debug for more detail)
+  config.log_level = :info
+
   # Make code changes take effect immediately without server restart.
   config.enable_reloading = true
 
@@ -46,21 +60,21 @@ Rails.application.configure do
   # Raise an error on page load if there are pending migrations.
   config.active_record.migration_error = :page_load
 
-  # Highlight code that triggered database queries in logs.
-  config.active_record.verbose_query_logs = true
+  # Disable verbose query logs for cleaner output
+  config.active_record.verbose_query_logs = false
 
-  # Append comments with runtime information tags to SQL queries in logs.
-  config.active_record.query_log_tags_enabled = true
+  # Disable query log tags for cleaner SQL in logs
+  config.active_record.query_log_tags_enabled = false
 
-  # Highlight code that enqueued background job in logs.
-  config.active_job.verbose_enqueue_logs = true
+  # Disable verbose enqueue logs for cleaner output
+  config.active_job.verbose_enqueue_logs = false
 
   # Use Solid Queue in development to test queuing behavior
   config.active_job.queue_adapter = :solid_queue
   config.solid_queue.connects_to = { database: { writing: :queue } }
 
-  # Highlight code that triggered redirect in logs.
-  config.action_dispatch.verbose_redirect_logs = true
+  # Disable verbose redirect logs for cleaner output
+  config.action_dispatch.verbose_redirect_logs = false
 
   # Suppress logger output for asset requests.
   config.assets.quiet = true
