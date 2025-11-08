@@ -1,0 +1,168 @@
+<div class="max-w-4xl mx-auto">
+  <!-- Page Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl sm:text-4xl font-bold text-white mb-2">Bankroll Management</h1>
+    <p class="text-gray-400">Manage your sports betting bankroll</p>
+  </div>
+
+  <!-- Bankroll Balance Card -->
+  <div class="bg-[#1a1a2e] rounded-lg shadow-lg p-6 sm:p-8 mb-8 border border-gray-700">
+    <div class="text-center">
+      <h2 class="text-lg text-gray-400 mb-2">Total Balance</h2>
+      <p class="text-5xl sm:text-6xl font-bold text-[#4CAF50] mb-4">
+        <%= number_to_currency(@bankroll.total_balance, precision: 2) %>
+      </p>
+
+      <div class="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-gray-700">
+        <div>
+          <p class="text-sm text-gray-400 mb-1">Available</p>
+          <p class="text-2xl font-semibold text-white">
+            <%= number_to_currency(@bankroll.available_balance, precision: 2) %>
+          </p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-400 mb-1">Locked in Bets</p>
+          <p class="text-2xl font-semibold text-white">
+            <%= number_to_currency(@bankroll.locked_balance, precision: 2) %>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deposit and Withdraw Forms -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <!-- Deposit Card -->
+    <div class="bg-[#1a1a2e] rounded-lg shadow-lg p-6 border border-gray-700">
+      <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+        <svg class="w-6 h-6 mr-2 text-[#4CAF50]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+        </svg>
+        Deposit Funds
+      </h3>
+
+      <%= form_with url: deposit_bankroll_path, method: :post, local: true, class: "space-y-4" do |f| %>
+        <div>
+          <label for="deposit_amount" class="block text-sm font-medium text-gray-300 mb-2">Amount</label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg">$</span>
+            <%= number_field_tag :amount, nil,
+              id: "deposit_amount",
+              step: 0.01,
+              min: Bankroll::MIN_DEPOSIT,
+              max: Bankroll::MAX_TRANSACTION,
+              placeholder: "0.00",
+              required: true,
+              class: "w-full pl-8 pr-4 py-3 bg-[#0f0f1e] border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#4CAF50] focus:border-transparent" %>
+          </div>
+          <p class="mt-2 text-xs text-gray-400">
+            Minimum: <%= number_to_currency(Bankroll::MIN_DEPOSIT) %> | Maximum: <%= number_to_currency(Bankroll::MAX_TRANSACTION) %>
+          </p>
+        </div>
+
+        <%= button_tag type: "submit", class: "w-full px-6 py-3 bg-[#4CAF50] text-white font-semibold rounded-lg hover:bg-[#45a049] transition-all duration-200 hover:shadow-lg hover:shadow-[#4CAF50]/30" do %>
+          <span class="flex items-center justify-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            Deposit
+          </span>
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- Withdraw Card -->
+    <div class="bg-[#1a1a2e] rounded-lg shadow-lg p-6 border border-gray-700">
+      <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+        <svg class="w-6 h-6 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+        </svg>
+        Withdraw Funds
+      </h3>
+
+      <%= form_with url: withdraw_bankroll_path, method: :post, local: true, class: "space-y-4" do |f| %>
+        <div>
+          <label for="withdraw_amount" class="block text-sm font-medium text-gray-300 mb-2">Amount</label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg">$</span>
+            <%= number_field_tag :amount, nil,
+              id: "withdraw_amount",
+              step: 0.01,
+              min: Bankroll::MIN_WITHDRAWAL,
+              max: @bankroll.available_balance,
+              placeholder: "0.00",
+              required: true,
+              class: "w-full pl-8 pr-4 py-3 bg-[#0f0f1e] border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" %>
+          </div>
+          <p class="mt-2 text-xs text-gray-400">
+            Minimum: <%= number_to_currency(Bankroll::MIN_WITHDRAWAL) %> | Available: <%= number_to_currency(@bankroll.available_balance) %>
+          </p>
+        </div>
+
+        <%= button_tag type: "submit", class: "w-full px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-all duration-200 hover:shadow-lg hover:shadow-red-600/30" do %>
+          <span class="flex items-center justify-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+            </svg>
+            Withdraw
+          </span>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Recent Transactions -->
+  <% if @recent_transactions.any? %>
+    <div class="bg-[#1a1a2e] rounded-lg shadow-lg p-6 border border-gray-700">
+      <h3 class="text-xl font-bold text-white mb-4">Recent Transactions</h3>
+
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-gray-700">
+              <th class="text-left py-3 px-4 text-sm font-semibold text-gray-400">Date</th>
+              <th class="text-left py-3 px-4 text-sm font-semibold text-gray-400">Type</th>
+              <th class="text-right py-3 px-4 text-sm font-semibold text-gray-400">Amount</th>
+              <th class="text-right py-3 px-4 text-sm font-semibold text-gray-400">Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @recent_transactions.each do |transaction| %>
+              <tr class="border-b border-gray-800 hover:bg-[#0f0f1e] transition-colors">
+                <td class="py-3 px-4 text-sm text-gray-300">
+                  <%= transaction.created_at.strftime("%b %d, %Y %I:%M %p") %>
+                </td>
+                <td class="py-3 px-4">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                    <%= case transaction.transaction_type
+                        when 'deposit' then 'bg-green-900 text-green-300'
+                        when 'withdrawal' then 'bg-red-900 text-red-300'
+                        when 'bet_placed' then 'bg-yellow-900 text-yellow-300'
+                        when 'bet_won' then 'bg-green-900 text-green-300'
+                        when 'bet_lost' then 'bg-red-900 text-red-300'
+                        when 'bet_canceled', 'bet_push' then 'bg-gray-700 text-gray-300'
+                        else 'bg-gray-700 text-gray-300'
+                        end %>">
+                    <%= transaction.transaction_type.titleize %>
+                  </span>
+                </td>
+                <td class="py-3 px-4 text-right text-sm font-semibold
+                  <%= transaction.transaction_type.in?(['deposit', 'bet_won']) ? 'text-green-400' :
+                      transaction.transaction_type.in?(['withdrawal', 'bet_lost']) ? 'text-red-400' : 'text-gray-300' %>">
+                  <%= number_to_currency(transaction.amount, precision: 2) %>
+                </td>
+                <td class="py-3 px-4 text-right text-sm text-gray-300">
+                  <%= number_to_currency(transaction.balance_after, precision: 2) %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% else %>
+    <div class="bg-[#1a1a2e] rounded-lg shadow-lg p-8 border border-gray-700 text-center">
+      <p class="text-gray-400">No transactions yet. Make your first deposit to get started!</p>
+    </div>
+  <% end %>
+</div>

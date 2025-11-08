@@ -7,6 +7,12 @@ Rails.application.routes.draw do
   # Games routes
   resources :games, only: [:index]
 
+  # Bankroll routes
+  resource :bankroll, only: [:show] do
+    post :deposit
+    post :withdraw
+  end
+
   # Set the homepage to show all games
   root "games#index"
 

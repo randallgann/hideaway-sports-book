@@ -10,7 +10,8 @@ module PaymentAdapters
       @starting_balance = config[:starting_balance] || DEFAULT_STARTING_BALANCE
     end
 
-    # Process a paper trading payment
+    # Process a paper trading payment (deposit funds)
+    # For paper trading, this adds unlimited funds to the account
     # @param amount [Numeric] Amount to charge in dollars
     # @param currency [String] Currency code
     # @param options [Hash] Must include :customer_id
@@ -28,15 +29,7 @@ module PaymentAdapters
         currency: currency
       )
 
-      # Check sufficient funds
-      if account.balance < amount
-        return error_response(
-          "Insufficient funds. Balance: #{account.balance}, Required: #{amount}",
-          balance: account.balance,
-          required: amount
-        )
-      end
-
+      # For paper trading deposits, we don't check balance - unlimited fake money!
       # Create transaction record
       transaction = PaperTradingTransaction.create!(
         paper_trading_account: account,
@@ -47,8 +40,8 @@ module PaymentAdapters
         metadata: options[:metadata] || {}
       )
 
-      # Debit account
-      account.debit!(amount)
+      # Credit account (add funds for deposit)
+      account.credit!(amount)
 
       success_response(
         transaction_id: transaction.transaction_id,
@@ -59,8 +52,6 @@ module PaymentAdapters
       )
     rescue ArgumentError
       raise  # Let ArgumentError bubble up for caller to handle
-    rescue InsufficientFundsError => e
-      error_response(e.message, balance: account&.balance)
     rescue StandardError => e
       error_response("Payment failed: #{e.message}")
     end
@@ -118,7 +109,7 @@ module PaymentAdapters
       error_response("Refund failed: #{e.message}")
     end
 
-    # Withdraw funds from paper trading account (payout)
+    # Withdraw funds from paper trading account (remove funds)
     # @param amount [Numeric] Amount to withdraw
     # @param currency [String] Currency code
     # @param options [Hash] Must include :customer_id
@@ -129,13 +120,22 @@ module PaymentAdapters
       customer_id = options[:customer_id]
       raise ArgumentError, "customer_id is required" unless customer_id
 
-      # Find existing account (must exist - can't withdraw to non-existent account)
+      # Find existing account (must exist - can't withdraw from non-existent account)
       account = PaperTradingAccount.find_by(customer_id: customer_id)
       unless account
         return error_response("No payment account found for customer #{customer_id}. Please make a deposit first.")
       end
 
-      # Create withdrawal transaction (payout to customer)
+      # Check sufficient funds for withdrawal
+      if account.balance < amount
+        return error_response(
+          "Insufficient funds for withdrawal. Balance: #{account.balance}, Required: #{amount}",
+          balance: account.balance,
+          required: amount
+        )
+      end
+
+      # Create withdrawal transaction
       withdrawal_transaction = PaperTradingTransaction.create!(
         paper_trading_account: account,
         transaction_type: 'withdrawal',
@@ -145,8 +145,8 @@ module PaymentAdapters
         metadata: options[:metadata] || {}
       )
 
-      # Credit account (withdrawal is a payout, adds money to external account)
-      account.credit!(amount)
+      # Debit account (remove funds for withdrawal)
+      account.debit!(amount)
 
       success_response(
         withdrawal_id: withdrawal_transaction.transaction_id,

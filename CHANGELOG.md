@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- **Bankroll Management Page** (`app/views/bankrolls/show.html.erb`):
+  - Display total balance, available balance, and locked balance
+  - Deposit form with validation (min $10, max $10,000)
+  - Withdraw form with validation (min $20, max available balance)
+  - Recent transaction history table with color-coded transaction types
+  - Mobile-responsive dark theme design
+- **BankrollsController** with three actions:
+  - `show` - Display bankroll management page
+  - `deposit` - Process deposit requests
+  - `withdraw` - Process withdrawal requests
+- **Clickable bankroll display in navbar**:
+  - Links to bankroll management page on both mobile and desktop views
+  - Hover effect for better UX
+  - Display format: `$X,XXX.XX`
+- **Bankroll routes** (`config/routes.rb`):
+  - `GET /bankroll` - Show bankroll page
+  - `POST /bankroll/deposit` - Process deposits
+  - `POST /bankroll/withdraw` - Process withdrawals
 - **The Odds API Integration**: Complete service layer for fetching live odds data
   - `OddsApi::Client` - HTTParty-based API client with error handling and rate limit tracking
   - `OddsApi::TeamMatcher` - Fuzzy matching to map API teams to local database teams
@@ -26,8 +44,18 @@ All notable changes to this project will be documented in this file.
 - Updated Team and Game models with validations for `external_id` uniqueness
 - Configured WebMock and VCR in test_helper.rb for API testing
 - Set root route to `games#index` for sportsbook homepage
+- **Navbar enhancements**:
+  - Made bankroll amount clickable (links to `/bankroll`)
+  - Added dark background to body (`bg-[#0f0f1e]`)
+  - Bankroll display now shown in both mobile and desktop views
 
 ### Fixed
+- **Fixed PaperTradingAdapter deposit/withdrawal logic** (`app/services/payment_adapters/paper_trading_adapter.rb`):
+  - `charge` method now correctly credits account for deposits (was incorrectly debiting)
+  - Removed balance check from deposits - unlimited paper trading funds
+  - `withdraw` method now correctly debits account for withdrawals (was incorrectly crediting)
+  - Added balance check to withdrawals to prevent overdrafts
+  - Previously deposits failed with "Insufficient funds" error
 - Fixed VS Code Ruby LSP workspace activation hanging by changing from `custom` to `rbenv` identifier in `.vscode/settings.json`
 - Fixed test route helper - changed from `games_index_url` to `games_url` in controller tests
 - Added `resources :games, only: [:index]` route to properly generate URL helpers
