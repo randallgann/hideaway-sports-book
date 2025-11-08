@@ -73,20 +73,42 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" style="gap: 1.25rem;">
 
                 <% game.betting_lines.each do |line| %>
-                  <div class="border border-gray-200 rounded-lg p-4 sm:p-5 bg-gray-50 hover:bg-gray-100 transition-colors duration-150">
+                  <div class="border border-gray-200 rounded-lg p-4 sm:p-5 bg-gray-50">
                     <strong class="block mb-3 text-xs sm:text-sm font-bold uppercase tracking-wide text-gray-700">
                       <%= line.line_type.gsub('_', ' ') %>
                     </strong>
 
                     <% if line.line_type == 'moneyline' %>
                       <div class="text-sm sm:text-base space-y-2">
-                        <div class="flex justify-between items-center">
+                        <!-- Home team moneyline option -->
+                        <div class="flex justify-between items-center p-2 rounded cursor-pointer hover:bg-gray-200 transition-all"
+                             data-controller="bet-selector"
+                             data-action="click->bet-selector#selectBet"
+                             data-bet-selector-betting-line-id-value="<%= line.id %>"
+                             data-bet-selector-game-id-value="<%= game.id %>"
+                             data-bet-selector-bet-type-value="moneyline"
+                             data-bet-selector-selection-value="home"
+                             data-bet-selector-odds-value="<%= line.home_odds %>"
+                             data-bet-selector-line-value-value="0"
+                             data-bet-selector-home-team-value="<%= game.home_team.name %>"
+                             data-bet-selector-away-team-value="<%= game.away_team.name %>">
                           <span class="font-medium"><%= game.home_team.abbreviation %>:</span>
                           <span class="<%= line.home_odds < 0 ? 'text-red-600' : 'text-green-600' %> font-semibold">
                             <%= line.home_odds > 0 ? "+#{line.home_odds.to_i}" : line.home_odds.to_i %>
                           </span>
                         </div>
-                        <div class="flex justify-between items-center">
+                        <!-- Away team moneyline option -->
+                        <div class="flex justify-between items-center p-2 rounded cursor-pointer hover:bg-gray-200 transition-all"
+                             data-controller="bet-selector"
+                             data-action="click->bet-selector#selectBet"
+                             data-bet-selector-betting-line-id-value="<%= line.id %>"
+                             data-bet-selector-game-id-value="<%= game.id %>"
+                             data-bet-selector-bet-type-value="moneyline"
+                             data-bet-selector-selection-value="away"
+                             data-bet-selector-odds-value="<%= line.away_odds %>"
+                             data-bet-selector-line-value-value="0"
+                             data-bet-selector-home-team-value="<%= game.home_team.name %>"
+                             data-bet-selector-away-team-value="<%= game.away_team.name %>">
                           <span class="font-medium"><%= game.away_team.abbreviation %>:</span>
                           <span class="<%= line.away_odds < 0 ? 'text-red-600' : 'text-green-600' %> font-semibold">
                             <%= line.away_odds > 0 ? "+#{line.away_odds.to_i}" : line.away_odds.to_i %>
@@ -96,11 +118,33 @@
 
                     <% elsif line.line_type == 'spread' %>
                       <div class="text-sm sm:text-base space-y-2">
-                        <div class="flex justify-between items-center">
+                        <!-- Home team spread option -->
+                        <div class="flex justify-between items-center p-2 rounded cursor-pointer hover:bg-gray-200 transition-all"
+                             data-controller="bet-selector"
+                             data-action="click->bet-selector#selectBet"
+                             data-bet-selector-betting-line-id-value="<%= line.id %>"
+                             data-bet-selector-game-id-value="<%= game.id %>"
+                             data-bet-selector-bet-type-value="spread"
+                             data-bet-selector-selection-value="home"
+                             data-bet-selector-odds-value="<%= line.home_odds %>"
+                             data-bet-selector-line-value-value="<%= line.spread %>"
+                             data-bet-selector-home-team-value="<%= game.home_team.name %>"
+                             data-bet-selector-away-team-value="<%= game.away_team.name %>">
                           <span class="font-medium"><%= game.home_team.abbreviation %> <%= line.spread > 0 ? "+#{line.spread}" : line.spread %></span>
                           <span class="text-gray-700">(<%= line.home_odds.to_i %>)</span>
                         </div>
-                        <div class="flex justify-between items-center">
+                        <!-- Away team spread option -->
+                        <div class="flex justify-between items-center p-2 rounded cursor-pointer hover:bg-gray-200 transition-all"
+                             data-controller="bet-selector"
+                             data-action="click->bet-selector#selectBet"
+                             data-bet-selector-betting-line-id-value="<%= line.id %>"
+                             data-bet-selector-game-id-value="<%= game.id %>"
+                             data-bet-selector-bet-type-value="spread"
+                             data-bet-selector-selection-value="away"
+                             data-bet-selector-odds-value="<%= line.away_odds %>"
+                             data-bet-selector-line-value-value="<%= line.spread * -1 %>"
+                             data-bet-selector-home-team-value="<%= game.home_team.name %>"
+                             data-bet-selector-away-team-value="<%= game.away_team.name %>">
                           <span class="font-medium"><%= game.away_team.abbreviation %> <%= line.spread < 0 ? "+#{-line.spread}" : -line.spread %></span>
                           <span class="text-gray-700">(<%= line.away_odds.to_i %>)</span>
                         </div>
@@ -108,16 +152,43 @@
 
                     <% elsif line.line_type == 'over_under' %>
                       <div class="text-sm sm:text-base space-y-2">
-                        <div class="flex justify-between items-center">
+                        <!-- Over option -->
+                        <div class="flex justify-between items-center p-2 rounded cursor-pointer hover:bg-gray-200 transition-all"
+                             data-controller="bet-selector"
+                             data-action="click->bet-selector#selectBet"
+                             data-bet-selector-betting-line-id-value="<%= line.id %>"
+                             data-bet-selector-game-id-value="<%= game.id %>"
+                             data-bet-selector-bet-type-value="over_under"
+                             data-bet-selector-selection-value="over"
+                             data-bet-selector-odds-value="<%= line.over_odds %>"
+                             data-bet-selector-line-value-value="<%= line.total %>"
+                             data-bet-selector-home-team-value="<%= game.home_team.name %>"
+                             data-bet-selector-away-team-value="<%= game.away_team.name %>">
                           <span class="font-medium">Over <%= line.total %>:</span>
                           <span class="text-gray-700 font-semibold"><%= line.over_odds.to_i %></span>
                         </div>
-                        <div class="flex justify-between items-center">
+                        <!-- Under option -->
+                        <div class="flex justify-between items-center p-2 rounded cursor-pointer hover:bg-gray-200 transition-all"
+                             data-controller="bet-selector"
+                             data-action="click->bet-selector#selectBet"
+                             data-bet-selector-betting-line-id-value="<%= line.id %>"
+                             data-bet-selector-game-id-value="<%= game.id %>"
+                             data-bet-selector-bet-type-value="over_under"
+                             data-bet-selector-selection-value="under"
+                             data-bet-selector-odds-value="<%= line.under_odds %>"
+                             data-bet-selector-line-value-value="<%= line.total %>"
+                             data-bet-selector-home-team-value="<%= game.home_team.name %>"
+                             data-bet-selector-away-team-value="<%= game.away_team.name %>">
                           <span class="font-medium">Under <%= line.total %>:</span>
                           <span class="text-gray-700 font-semibold"><%= line.under_odds.to_i %></span>
                         </div>
                       </div>
                     <% end %>
+
+                    <!-- Bet count display -->
+                    <div class="text-xs text-gray-500 mt-3 text-center">
+                      <%= line.bets_count %> <%= 'bet'.pluralize(line.bets_count) %> placed
+                    </div>
                   </div>
                 <% end %>
 

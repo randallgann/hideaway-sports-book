@@ -8,6 +8,7 @@ class User < ApplicationRecord
 
   # Associations
   has_one :bankroll, dependent: :destroy
+  has_many :bets, dependent: :destroy
 
   # Validations
   validates :username, uniqueness: true, allow_nil: true
