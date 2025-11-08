@@ -42,4 +42,21 @@ module BettingHelper
 
     spread > 0 ? "+#{spread}" : spread.to_s
   end
+
+  # Format bet selection for display
+  def format_bet_selection(bet)
+    case bet.betting_line.line_type
+    when 'moneyline'
+      team_name = bet.selection == 'home' ? bet.metadata['home_team_abbr'] : bet.metadata['away_team_abbr']
+      "#{team_name} to Win"
+    when 'spread'
+      team_name = bet.selection == 'home' ? bet.metadata['home_team_abbr'] : bet.metadata['away_team_abbr']
+      line_value = bet.line_value_at_placement
+      "#{team_name} #{format_spread(line_value)}"
+    when 'over_under'
+      "#{bet.selection.titleize} #{bet.line_value_at_placement}"
+    else
+      bet.selection.titleize
+    end
+  end
 end

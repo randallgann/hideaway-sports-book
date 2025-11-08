@@ -1,5 +1,43 @@
 class BetsController < ApplicationController
   before_action :authenticate_user!
+  before_action :set_bet, only: [:show, :cancel]
+
+  def index
+    @pending_bets = current_user.bets.pending
+                                .includes(game: [:home_team, :away_team], betting_line: :game)
+                                .order(created_at: :desc)
+
+    @settled_bets = current_user.bets.settled
+                                .includes(game: [:home_team, :away_team], betting_line: :game)
+                                .order(settled_at: :desc)
+                                .limit(50)
+  end
+
+  def show
+    # @bet set by before_action
+  end
+
+  def cancel
+    # Validate bet is still pending
+    unless @bet.status == 'pending'
+      redirect_to bets_path, alert: "Can only cancel pending bets" and return
+    end
+
+    # Validate game hasn't started
+    if @bet.game.game_time < Time.current
+      redirect_to bet_path(@bet), alert: "Cannot cancel bet after game has started" and return
+    end
+
+    # Unlock funds in bankroll
+    result = current_user.bankroll.cancel_bet(@bet.id, @bet.amount)
+
+    if result[:success]
+      @bet.update!(status: 'canceled')
+      redirect_to bets_path, notice: "Bet canceled successfully - funds returned to your account"
+    else
+      redirect_to bet_path(@bet), alert: result[:message]
+    end
+  end
 
   def create
     @game = Game.find(params[:game_id])
@@ -84,5 +122,11 @@ class BetsController < ApplicationController
       success: false,
       message: "Game or betting line not found"
     }, status: :not_found
+  end
+
+  private
+
+  def set_bet
+    @bet = current_user.bets.find(params[:id])
   end
 end
