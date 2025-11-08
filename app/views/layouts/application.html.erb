@@ -26,7 +26,7 @@
   <body class="min-h-screen">
     <!-- Mobile-first responsive navbar -->
     <header class="bg-[#1a1a2e] shadow-md sticky top-0 z-50">
-      <nav class="mx-auto" style="padding-left: 1.25rem; padding-right: 1.25rem; max-width: 100%;" data-controller="mobile-menu">
+      <nav class="mx-auto px-5 max-w-full md:max-w-7xl" data-controller="mobile-menu">
         <div class="flex justify-between items-center" style="height: 4rem; padding-left: 0.5rem; padding-right: 0.5rem;">
           <!-- Brand/Logo with better spacing -->
           <div class="flex-shrink-0 py-2">
@@ -72,7 +72,7 @@
     </header>
 
     <!-- Main content container with mobile-first padding -->
-    <div class="mx-auto" style="padding-left: 1rem; padding-right: 1rem; padding-top: 1.5rem; padding-bottom: 2rem; max-width: 100%;">
+    <div class="mx-auto px-4 pt-6 pb-8 max-w-full md:max-w-7xl">
       <!-- Flash messages with mobile-first design -->
       <% if notice %>
         <div class="p-3 sm:p-4 bg-green-50 border-l-4 border-green-500 text-green-800 rounded-lg shadow-sm" style="margin-bottom: 1.5rem;">
