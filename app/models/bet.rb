@@ -20,6 +20,26 @@ class Bet < ApplicationRecord
   }
   validates :odds_at_placement, presence: true
 
+  # Custom validations
+  validate :amount_does_not_exceed_balance, on: :create
+  validate :game_has_not_started, on: :create
+
+  def amount_does_not_exceed_balance
+    return unless user && amount
+
+    if amount > user.bankroll.available_balance
+      errors.add(:amount, "exceeds available balance ($#{user.bankroll.available_balance})")
+    end
+  end
+
+  def game_has_not_started
+    return unless game
+
+    if game.game_time < Time.current
+      errors.add(:base, "Cannot place bet on game that has already started")
+    end
+  end
+
   # Scopes
   scope :pending, -> { where(status: 'pending') }
   scope :settled, -> { where(status: %w[won lost push]) }
@@ -29,13 +49,15 @@ class Bet < ApplicationRecord
   scope :for_game, ->(game_id) { where(game_id: game_id) }
   scope :recent, ->(limit = 10) { order(created_at: :desc).limit(limit) }
 
-  # Callbacks
-  before_create :snapshot_odds
-  before_create :calculate_potential_payout
-  before_create :populate_metadata
+  # Callbacks - Run before validation so presence validations pass
+  before_validation :snapshot_odds, on: :create
+  before_validation :calculate_potential_payout, on: :create
+  before_validation :populate_metadata, on: :create
 
   # Calculate potential payout from American odds
   def calculate_potential_payout
+    return unless odds_at_placement && amount
+
     if odds_at_placement > 0
       # Underdog: +130 means win $130 on $100 bet
       profit = amount * (odds_at_placement / 100.0)
@@ -49,6 +71,8 @@ class Bet < ApplicationRecord
 
   # Store game/team info for historical display
   def populate_metadata
+    return unless game && betting_line
+
     self.metadata = {
       game_time: game.game_time,
       sport: game.sport,
@@ -62,6 +86,8 @@ class Bet < ApplicationRecord
 
   # Snapshot odds at placement time
   def snapshot_odds
+    return unless betting_line && selection
+
     case betting_line.line_type
     when 'moneyline'
       self.odds_at_placement = selection == 'home' ? betting_line.home_odds : betting_line.away_odds

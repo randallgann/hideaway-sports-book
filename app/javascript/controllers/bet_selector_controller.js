@@ -34,5 +34,15 @@ export default class extends Controller {
     setTimeout(() => {
       this.element.classList.remove('ring-2', 'ring-green-500', 'bg-gray-700')
     }, 300)
+
+    // Open bet slip modal
+    const betSlipController = this.application.getControllerForElementAndIdentifier(
+      document.querySelector('[data-controller="bet-slip"]'),
+      'bet-slip'
+    )
+
+    if (betSlipController) {
+      betSlipController.open(betData)
+    }
   }
 }
