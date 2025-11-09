@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+- **Production deployment**: Assets must be precompiled after code updates (`RAILS_ENV=production bin/rails assets:precompile`)
+
 ### Added
 - **Betting/Offer System** - Complete 4-phase implementation:
   - **Phase 1 - Foundation**: `Bet` model with odds snapshots, validations, and settlement logic

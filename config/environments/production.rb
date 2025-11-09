@@ -25,22 +25,21 @@ Rails.application.configure do
   config.active_storage.service = :local
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
-  config.assume_ssl = true
+  config.assume_ssl = false
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  config.force_ssl = true
+  config.force_ssl = false
 
   # Skip http-to-https redirect for the default health check endpoint.
   # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
 
-  # Log to custom directory with the current request id as a default log tag.
+  # Log to STDOUT for systemd to capture, or to standard Rails log file
   config.log_tags = [ :request_id ]
-  log_file = Rails.root.join("logs", "hideaway_sports_book", "production.log")
-  logger = ActiveSupport::Logger.new(log_file, 1, 100.megabytes)
-  logger.formatter = proc do |severity, datetime, progname, msg|
-    "[#{datetime.strftime('%Y-%m-%d %H:%M:%S')}] #{severity} -- #{msg}\n"
+  if ENV["RAILS_LOG_TO_STDOUT"].present?
+    logger = ActiveSupport::Logger.new(STDOUT)
+    logger.formatter = config.log_formatter
+    config.logger = ActiveSupport::TaggedLogging.new(logger)
   end
-  config.logger = ActiveSupport::TaggedLogging.new(logger)
 
   # Disable colorized logging (removes ANSI codes)
   config.colorize_logging = false

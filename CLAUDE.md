@@ -86,6 +86,16 @@ git push -u origin feature/my-feature
 # Then create pull request on GitHub to merge into main
 ```
 
+## Production Deployment
+
+After pulling code updates in production:
+```bash
+bundle install                           # Install new gems
+RAILS_ENV=production bin/rails db:migrate   # Run migrations
+RAILS_ENV=production bin/rails assets:precompile  # Compile CSS/JS
+sudo systemctl restart hideaway-puma.service hideaway-solidqueue.service  # Restart services
+```
+
 ## Common Commands
 
 ### Development Server
