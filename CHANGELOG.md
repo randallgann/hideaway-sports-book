@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- **Betting/Offer System** - Complete 4-phase implementation:
+  - **Phase 1 - Foundation**: `Bet` model with odds snapshots, validations, and settlement logic
+    - Counter cache (`bets_count`) on betting lines to track bet volume
+    - Clickable betting line UI with Stimulus controller (`bet_selector_controller.js`)
+    - Helper methods for odds formatting and bet display
+  - **Phase 2 - Bet Placement**: Modal-based bet slip for placing bets
+    - `BetsController#create` with transaction handling and fund locking
+    - Real-time payout calculation in bet slip modal (`bet_slip_controller.js`)
+    - Custom validations: minimum bet ($5), sufficient balance, game not started
+    - Integration with bankroll `lock_funds_for_bet` method
+  - **Phase 3 - Bet Management**: Complete bet history and management interface
+    - "My Bets" page showing pending and settled bets with status badges
+    - Individual bet detail view with game info and payout breakdown
+    - Bet cancellation functionality (only before game starts)
+    - Navigation links added to header (desktop and mobile)
+  - **Phase 4 - Settlement**: Automated bet settlement background job
+    - `SettleBetsJob` runs every 10-15 minutes to settle completed games
+    - Determines outcomes for moneyline, spread, and over/under bets
+    - Handles wins, losses, and pushes with bankroll settlement methods
+    - Comprehensive logging for settlement tracking
+- **Betting System Routes**:
+  - `POST /bets` - Place new bet
+  - `GET /bets` - View all user bets
+  - `GET /bets/:id` - View bet details
+  - `POST /bets/:id/cancel` - Cancel pending bet
+- **Design Documentation**: Complete betting system architecture in `docs/BETTING_SYSTEM_DESIGN.md`
 - **Bankroll Management Page** (`app/views/bankrolls/show.html.erb`):
   - Display total balance, available balance, and locked balance
   - Deposit form with validation (min $10, max $10,000)
