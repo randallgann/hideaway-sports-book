@@ -1,0 +1,44 @@
+<div class="w-full">
+  <h1 class="text-3xl font-bold text-gray-800 mb-6">My Bets</h1>
+
+  <!-- Pending Bets Section -->
+  <div class="mb-8">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-4">
+      Pending Bets
+      <span class="text-lg font-normal text-gray-600">(<%= @pending_bets.count %>)</span>
+    </h2>
+
+    <% if @pending_bets.empty? %>
+      <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+        <p class="text-gray-600">No pending bets</p>
+        <%= link_to "Browse Games", root_path, class: "inline-block mt-3 text-green-600 hover:text-green-700 font-semibold" %>
+      </div>
+    <% else %>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <% @pending_bets.each do |bet| %>
+          <%= render 'bet_card', bet: bet, show_cancel: true %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Settled Bets Section -->
+  <div>
+    <h2 class="text-2xl font-semibold text-gray-800 mb-4">
+      Settled Bets
+      <span class="text-lg font-normal text-gray-600">(<%= @settled_bets.count %>)</span>
+    </h2>
+
+    <% if @settled_bets.empty? %>
+      <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+        <p class="text-gray-600">No settled bets yet</p>
+      </div>
+    <% else %>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <% @settled_bets.each do |bet| %>
+          <%= render 'bet_card', bet: bet, show_cancel: false %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

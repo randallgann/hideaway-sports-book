@@ -281,11 +281,27 @@ The application has three core models representing a sportsbook system:
   - `Game.from_api` - Games with external_id (from API, not manual)
 
 ### BettingLines
-- Fields: `line_type`, `home_odds`, `away_odds`, `spread`, `total`, `over_odds`, `under_odds`
-- Relationships: `belongs_to :game`
+- Fields: `line_type`, `home_odds`, `away_odds`, `spread`, `total`, `over_odds`, `under_odds`, `bets_count` (counter cache)
+- Relationships: `belongs_to :game`, `has_many :bets`
 - Line types: "moneyline", "spread", "over_under"
 - Odds format: American odds (e.g., -150, +130)
 - Each game can have multiple betting lines (one per type)
+
+### Bets
+- Fields: `selection` (home/away/over/under), `amount`, `odds_at_placement`, `line_value_at_placement`, `potential_payout`, `actual_payout`, `status`, `settled_at`, `metadata` (JSON)
+- Relationships: `belongs_to :user`, `belongs_to :game`, `belongs_to :betting_line`
+- Statuses: "pending", "won", "lost", "push", "canceled"
+- Snapshots odds and line values at placement time (immutable historical record)
+- Minimum bet: $5.00, validates available balance, prevents betting on started games
+- Settlement logic: `determine_result` evaluates bet outcome, `settle!` updates bankroll
+- Counter cache maintains `bets_count` on betting lines
+
+## Betting System Workflow
+
+1. **Bet Placement**: User clicks betting line → modal opens → enters amount → funds lock in bankroll → bet created with odds snapshot
+2. **Bet Management**: Users view pending/settled bets at `/bets`, can cancel pending bets before game starts (funds unlock)
+3. **Settlement**: `SettleBetsJob` runs every 10-15 minutes, finds completed games, determines outcomes (won/lost/push), settles bets by updating bankroll balances
+4. **Routes**: `POST /bets` (place), `GET /bets` (list), `GET /bets/:id` (details), `POST /bets/:id/cancel` (cancel)
 
 ## Sports Betting Concepts
 

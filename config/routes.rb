@@ -13,6 +13,13 @@ Rails.application.routes.draw do
     post :withdraw
   end
 
+  # Betting routes
+  resources :bets, only: [:index, :show, :create] do
+    member do
+      post :cancel
+    end
+  end
+
   # Set the homepage to show all games
   root "games#index"
 

@@ -1,0 +1,170 @@
+<div class="w-full max-w-3xl mx-auto">
+  <!-- Back Link -->
+  <div class="mb-4">
+    <%= link_to bets_path, class: "text-green-600 hover:text-green-700 font-semibold" do %>
+      ← Back to My Bets
+    <% end %>
+  </div>
+
+  <div class="bg-white border border-gray-200 rounded-lg shadow-lg p-6">
+    <!-- Header with Status -->
+    <div class="flex justify-between items-start mb-6">
+      <h1 class="text-2xl font-bold text-gray-800">Bet Details</h1>
+      <span class="px-4 py-2 rounded-full text-sm font-semibold <%= bet_status_badge_class(@bet.status) %>">
+        <%= @bet.status.upcase %>
+      </span>
+    </div>
+
+    <!-- Game Information -->
+    <div class="mb-6 pb-6 border-b border-gray-200">
+      <h2 class="text-lg font-semibold text-gray-800 mb-3">Game Information</h2>
+      <div class="bg-gray-50 rounded-lg p-4">
+        <h3 class="text-xl font-bold text-gray-800 mb-2">
+          <%= @bet.metadata['away_team'] %> @ <%= @bet.metadata['home_team'] %>
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+          <div>
+            <span class="text-gray-600">Sport:</span>
+            <span class="font-semibold text-gray-800 ml-2">
+              <%= @bet.metadata['sport']&.titleize %>
+            </span>
+          </div>
+          <div>
+            <span class="text-gray-600">Game Time:</span>
+            <span class="font-semibold text-gray-800 ml-2">
+              <%= @bet.game.game_time.strftime("%b %d, %Y at %I:%M %p") %>
+            </span>
+          </div>
+          <div>
+            <span class="text-gray-600">Game Status:</span>
+            <span class="font-semibold text-gray-800 ml-2">
+              <%= @bet.game.status.titleize %>
+            </span>
+          </div>
+          <% if @bet.game.status == 'completed' %>
+            <div>
+              <span class="text-gray-600">Final Score:</span>
+              <span class="font-semibold text-gray-800 ml-2">
+                <%= @bet.game.away_score %> - <%= @bet.game.home_score %>
+              </span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bet Information -->
+    <div class="mb-6 pb-6 border-b border-gray-200">
+      <h2 class="text-lg font-semibold text-gray-800 mb-3">Bet Information</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="bg-gray-50 rounded-lg p-4">
+          <span class="text-sm text-gray-600 block mb-1">Bet Type</span>
+          <span class="text-lg font-semibold text-gray-800">
+            <%= @bet.betting_line.line_type.gsub('_', ' ').titleize %>
+          </span>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-4">
+          <span class="text-sm text-gray-600 block mb-1">Selection</span>
+          <span class="text-lg font-semibold text-gray-800">
+            <%= format_bet_selection(@bet) %>
+          </span>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-4">
+          <span class="text-sm text-gray-600 block mb-1">Odds at Placement</span>
+          <span class="text-lg font-semibold <%= odds_color_class(@bet.odds_at_placement) %>">
+            <%= format_odds(@bet.odds_at_placement) %>
+          </span>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-4">
+          <span class="text-sm text-gray-600 block mb-1">Bet Amount</span>
+          <span class="text-lg font-semibold text-gray-800">
+            <%= number_to_currency(@bet.amount) %>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payout Information -->
+    <div class="mb-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-3">Payout Information</h2>
+      <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-6">
+        <% if @bet.status == 'pending' %>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-700 font-medium">Potential Payout:</span>
+            <span class="text-2xl font-bold text-green-600">
+              <%= number_to_currency(@bet.potential_payout) %>
+            </span>
+          </div>
+          <div class="flex justify-between items-center mt-2 text-sm">
+            <span class="text-gray-600">Potential Profit:</span>
+            <span class="font-semibold text-green-600">
+              <%= number_to_currency(@bet.potential_payout - @bet.amount) %>
+            </span>
+          </div>
+        <% elsif @bet.status == 'won' %>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-700 font-medium">Payout:</span>
+            <span class="text-2xl font-bold text-green-600">
+              <%= number_to_currency(@bet.actual_payout) %>
+            </span>
+          </div>
+          <div class="flex justify-between items-center mt-2">
+            <span class="text-gray-600">Profit:</span>
+            <span class="text-lg font-semibold text-green-600">
+              +<%= number_to_currency(@bet.actual_payout - @bet.amount) %>
+            </span>
+          </div>
+        <% elsif @bet.status == 'push' %>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-700 font-medium">Returned:</span>
+            <span class="text-2xl font-bold text-gray-600">
+              <%= number_to_currency(@bet.actual_payout) %>
+            </span>
+          </div>
+          <p class="text-sm text-gray-600 mt-2">Push - Your stake has been returned</p>
+        <% elsif @bet.status == 'lost' %>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-700 font-medium">Lost:</span>
+            <span class="text-2xl font-bold text-red-600">
+              -<%= number_to_currency(@bet.amount) %>
+            </span>
+          </div>
+        <% elsif @bet.status == 'canceled' %>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-700 font-medium">Returned:</span>
+            <span class="text-2xl font-bold text-gray-600">
+              <%= number_to_currency(@bet.amount) %>
+            </span>
+          </div>
+          <p class="text-sm text-gray-600 mt-2">Bet canceled - Funds returned to your account</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Timestamps -->
+    <div class="text-sm text-gray-600 space-y-1">
+      <div>
+        <span class="font-medium">Placed:</span>
+        <%= @bet.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+      </div>
+      <% if @bet.settled_at %>
+        <div>
+          <span class="font-medium">Settled:</span>
+          <%= @bet.settled_at.strftime("%B %d, %Y at %I:%M %p") %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-6 pt-6 border-t border-gray-200 flex gap-3">
+      <%= link_to "Back to My Bets", bets_path, class: "flex-1 text-center px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-semibold" %>
+
+      <% if @bet.status == 'pending' && @bet.game.game_time > Time.current %>
+        <%= button_to "Cancel Bet", cancel_bet_path(@bet),
+            method: :post,
+            data: { confirm: "Are you sure you want to cancel this bet? Funds will be returned to your available balance." },
+            class: "flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold" %>
+      <% end %>
+    </div>
+  </div>
+</div>

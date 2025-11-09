@@ -36,6 +36,12 @@ development:
     schedule: every day at 3am
     timezone: UTC
 
+  # Settle completed game bets every 15 minutes
+  settle_bets:
+    class: SettleBetsJob
+    queue: default
+    schedule: every 15 minutes
+
 production:
   # Bootstrap: Sync ALL sports twice daily to discover new games
   sync_all_sports:
@@ -62,6 +68,12 @@ production:
     queue: background
     schedule: every day at 3am
     timezone: UTC
+
+  # Settle completed game bets every 10 minutes
+  settle_bets:
+    class: SettleBetsJob
+    queue: default
+    schedule: every 10 minutes
 
   # Clean up finished jobs
   clear_solid_queue_finished_jobs:

@@ -2,6 +2,7 @@ class Game < ApplicationRecord
   belongs_to :home_team, class_name: 'Team'
   belongs_to :away_team, class_name: 'Team'
   has_many :betting_lines, dependent: :destroy
+  has_many :bets, dependent: :restrict_with_error
 
   validates :external_id, uniqueness: true, allow_nil: true
 

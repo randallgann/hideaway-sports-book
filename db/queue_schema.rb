@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_07_165544) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_08_215103) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -44,8 +44,33 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_07_165544) do
     t.index ["user_id"], name: "index_bankrolls_on_user_id", unique: true
   end
 
+  create_table "bets", force: :cascade do |t|
+    t.decimal "actual_payout", precision: 10, scale: 2
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.bigint "betting_line_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "game_id", null: false
+    t.decimal "line_value_at_placement", precision: 8, scale: 2
+    t.text "metadata"
+    t.decimal "odds_at_placement", precision: 8, scale: 2, null: false
+    t.decimal "potential_payout", precision: 10, scale: 2, null: false
+    t.string "selection", null: false
+    t.datetime "settled_at"
+    t.text "settlement_notes"
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["betting_line_id"], name: "index_bets_on_betting_line_id"
+    t.index ["created_at"], name: "index_bets_on_created_at"
+    t.index ["game_id", "status"], name: "index_bets_on_game_id_and_status"
+    t.index ["game_id"], name: "index_bets_on_game_id"
+    t.index ["user_id", "status"], name: "index_bets_on_user_id_and_status"
+    t.index ["user_id"], name: "index_bets_on_user_id"
+  end
+
   create_table "betting_lines", force: :cascade do |t|
     t.decimal "away_odds", precision: 8, scale: 2
+    t.integer "bets_count", default: 0, null: false
     t.datetime "created_at", null: false
     t.integer "game_id", null: false
     t.decimal "home_odds", precision: 8, scale: 2
@@ -262,6 +287,9 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_07_165544) do
 
   add_foreign_key "bankroll_transactions", "bankrolls"
   add_foreign_key "bankrolls", "users"
+  add_foreign_key "bets", "betting_lines"
+  add_foreign_key "bets", "games"
+  add_foreign_key "bets", "users"
   add_foreign_key "betting_lines", "games"
   add_foreign_key "games", "teams", column: "away_team_id"
   add_foreign_key "games", "teams", column: "home_team_id"

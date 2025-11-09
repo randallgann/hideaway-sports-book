@@ -1,0 +1,94 @@
+<div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow">
+  <!-- Bet Status Badge -->
+  <div class="flex justify-between items-start mb-3">
+    <span class="px-3 py-1 rounded-full text-xs font-semibold <%= bet_status_badge_class(bet.status) %>">
+      <%= bet.status.upcase %>
+    </span>
+    <span class="text-xs text-gray-500">
+      <%= bet.created_at.strftime("%b %d, %Y at %I:%M %p") %>
+    </span>
+  </div>
+
+  <!-- Game Info -->
+  <div class="mb-3">
+    <h3 class="text-lg font-semibold text-gray-800">
+      <%= bet.metadata['away_team'] %> @ <%= bet.metadata['home_team'] %>
+    </h3>
+    <p class="text-sm text-gray-600">
+      <%= bet.metadata['sport']&.titleize %> •
+      <%= bet.game.game_time.strftime("%b %d at %I:%M %p") %>
+    </p>
+  </div>
+
+  <!-- Bet Details -->
+  <div class="bg-gray-50 rounded-lg p-3 mb-3">
+    <div class="grid grid-cols-2 gap-3 text-sm">
+      <div>
+        <span class="text-gray-600">Bet Type:</span>
+        <span class="font-semibold text-gray-800 ml-1">
+          <%= bet.betting_line.line_type.gsub('_', ' ').titleize %>
+        </span>
+      </div>
+      <div>
+        <span class="text-gray-600">Selection:</span>
+        <span class="font-semibold text-gray-800 ml-1">
+          <%= format_bet_selection(bet) %>
+        </span>
+      </div>
+      <div>
+        <span class="text-gray-600">Odds:</span>
+        <span class="font-semibold <%= odds_color_class(bet.odds_at_placement) %> ml-1">
+          <%= format_odds(bet.odds_at_placement) %>
+        </span>
+      </div>
+      <div>
+        <span class="text-gray-600">Amount:</span>
+        <span class="font-semibold text-gray-800 ml-1">
+          <%= number_to_currency(bet.amount) %>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payout Information -->
+  <% if bet.status == 'pending' %>
+    <div class="flex justify-between items-center py-2 border-t border-gray-200">
+      <span class="text-sm text-gray-600">Potential Payout:</span>
+      <span class="text-lg font-bold text-green-600">
+        <%= number_to_currency(bet.potential_payout) %>
+      </span>
+    </div>
+  <% else %>
+    <div class="flex justify-between items-center py-2 border-t border-gray-200">
+      <span class="text-sm text-gray-600">
+        <%= bet.status == 'won' ? 'Payout:' : bet.status == 'push' ? 'Returned:' : 'Lost:' %>
+      </span>
+      <span class="text-lg font-bold <%= bet.status == 'won' ? 'text-green-600' : bet.status == 'push' ? 'text-gray-600' : 'text-red-600' %>">
+        <%= number_to_currency(bet.actual_payout || 0) %>
+      </span>
+    </div>
+    <% if bet.status == 'won' %>
+      <div class="text-sm text-gray-600 text-right">
+        Profit: <span class="font-semibold text-green-600">
+          <%= number_to_currency(bet.actual_payout - bet.amount) %>
+        </span>
+      </div>
+    <% end %>
+  <% end %>
+
+  <!-- Action Buttons -->
+  <div class="mt-4 flex gap-2">
+    <%= link_to "View Details", bet_path(bet), class: "flex-1 text-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-semibold" %>
+
+    <% if show_cancel && bet.game.game_time > Time.current %>
+      <%= button_to "Cancel Bet", cancel_bet_path(bet),
+          method: :post,
+          data: { confirm: "Are you sure you want to cancel this bet? Funds will be returned to your available balance." },
+          class: "flex-1 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-semibold" %>
+    <% elsif show_cancel %>
+      <button disabled class="flex-1 px-4 py-2 bg-gray-200 text-gray-400 rounded-lg cursor-not-allowed text-sm font-semibold">
+        Game Started
+      </button>
+    <% end %>
+  </div>
+</div>
