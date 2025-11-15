@@ -18,10 +18,11 @@ development:
     timezone: UTC
 
   # Sync live games every 15 minutes (less frequent in dev to conserve API requests)
-  sync_live_games:
-    class: SyncLiveGamesJob
-    queue: critical
-    schedule: every 15 minutes
+  # DISABLED: Uncomment to re-enable live game syncing
+  # sync_live_games:
+  #   class: SyncLiveGamesJob
+  #   queue: critical
+  #   schedule: every 15 minutes
 
   # Sync upcoming games every 2 hours
   sync_upcoming_games:
@@ -51,10 +52,11 @@ production:
     timezone: UTC
 
   # Sync live games every 5 minutes for real-time odds
-  sync_live_games:
-    class: SyncLiveGamesJob
-    queue: critical
-    schedule: every 5 minutes
+  # DISABLED: Uncomment to re-enable live game syncing
+  # sync_live_games:
+  #   class: SyncLiveGamesJob
+  #   queue: critical
+  #   schedule: every 5 minutes
 
   # Sync upcoming games every hour
   sync_upcoming_games:
