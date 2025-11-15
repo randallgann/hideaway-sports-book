@@ -13,9 +13,10 @@ class GamesController < ApplicationController
     # Group games by sport and sort sports alphabetically
     @games_by_sport = games.group_by(&:sport).sort.to_h
 
-    # Get last execution times for each sync job
-    @last_live_sync = JobExecution.last_execution_time('SyncLiveGamesJob')
-    @last_upcoming_sync = JobExecution.last_execution_time('SyncUpcomingGamesJob')
-    @last_distant_sync = JobExecution.last_execution_time('SyncDistantGamesJob')
+    # Get actual data sync times from games (not job execution times)
+    # This shows when odds data was last successfully updated from the API
+    @last_live_sync = Game.from_api.live_window.maximum(:last_synced_at)
+    @last_upcoming_sync = Game.from_api.upcoming_window.maximum(:last_synced_at)
+    @last_distant_sync = Game.from_api.distant_window.maximum(:last_synced_at)
   end
 end
