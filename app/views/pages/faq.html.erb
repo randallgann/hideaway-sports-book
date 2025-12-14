@@ -1,0 +1,255 @@
+<div class="w-full">
+  <h1 class="text-2xl sm:text-3xl font-bold text-gray-800" style="margin-bottom: 1.5rem;">Frequently Asked Questions</h1>
+
+  <div class="space-y-4">
+
+    <!-- What is Hideaway Sports Book? -->
+    <div data-controller="collapsible" class="bg-gray-100 border border-gray-300 rounded-lg">
+      <div class="flex items-center p-4 sm:p-5 cursor-pointer select-none hover:bg-gray-200 transition-colors duration-200"
+           data-action="click->collapsible#toggle">
+        <span class="inline-block mr-3 sm:mr-4 text-xs sm:text-sm text-gray-600 transition-transform duration-300"
+              data-collapsible-target="arrow"
+              aria-expanded="false">▶</span>
+        <h3 class="text-base sm:text-lg font-semibold text-gray-800 m-0">What is Hideaway Sports Book?</h3>
+      </div>
+      <div data-collapsible-target="content" class="border-t border-gray-300 p-4 sm:p-5 bg-white rounded-b-lg">
+        <p class="text-gray-700 leading-relaxed">
+          Hideaway Sports Book is a <strong>paper betting simulation</strong> - similar to paper trading accounts in the stock market.
+          It's designed for entertainment and learning, allowing you to experience sports betting mechanics without any real money at risk.
+        </p>
+        <p class="text-gray-700 leading-relaxed mt-3">
+          You can place bets on real sporting events using real odds, compete with other players on the leaderboard,
+          and learn how the house vig (vigorish) affects your returns over time. Think of it as a safe sandbox to
+          develop your sports betting skills and strategies.
+        </p>
+      </div>
+    </div>
+
+    <!-- How do I get started? -->
+    <div data-controller="collapsible" class="bg-gray-100 border border-gray-300 rounded-lg">
+      <div class="flex items-center p-4 sm:p-5 cursor-pointer select-none hover:bg-gray-200 transition-colors duration-200"
+           data-action="click->collapsible#toggle">
+        <span class="inline-block mr-3 sm:mr-4 text-xs sm:text-sm text-gray-600 transition-transform duration-300"
+              data-collapsible-target="arrow"
+              aria-expanded="false">▶</span>
+        <h3 class="text-base sm:text-lg font-semibold text-gray-800 m-0">How do I get started?</h3>
+      </div>
+      <div data-collapsible-target="content" class="border-t border-gray-300 p-4 sm:p-5 bg-white rounded-b-lg">
+        <p class="text-gray-700 leading-relaxed">
+          Getting started is easy! You have two options:
+        </p>
+        <ul class="list-disc list-inside text-gray-700 mt-3 space-y-2">
+          <li><strong>Sign up with your email</strong> - Create an account to track your betting history across sessions</li>
+          <li><strong>Play anonymously</strong> - Jump right in without creating an account</li>
+        </ul>
+        <p class="text-gray-700 leading-relaxed mt-3">
+          Either way, you'll receive <strong class="text-[#4CAF50]">$5,000 in play money</strong> to start betting immediately!
+        </p>
+      </div>
+    </div>
+
+    <!-- How does the bankroll work? -->
+    <div data-controller="collapsible" class="bg-gray-100 border border-gray-300 rounded-lg">
+      <div class="flex items-center p-4 sm:p-5 cursor-pointer select-none hover:bg-gray-200 transition-colors duration-200"
+           data-action="click->collapsible#toggle">
+        <span class="inline-block mr-3 sm:mr-4 text-xs sm:text-sm text-gray-600 transition-transform duration-300"
+              data-collapsible-target="arrow"
+              aria-expanded="false">▶</span>
+        <h3 class="text-base sm:text-lg font-semibold text-gray-800 m-0">How does the bankroll work?</h3>
+      </div>
+      <div data-collapsible-target="content" class="border-t border-gray-300 p-4 sm:p-5 bg-white rounded-b-lg">
+        <p class="text-gray-700 leading-relaxed">
+          Your bankroll is your play money balance. When you first join, you receive <strong>$5,000</strong> to bet with.
+        </p>
+        <ul class="list-disc list-inside text-gray-700 mt-3 space-y-2">
+          <li><strong>Total Balance</strong> - Your complete bankroll amount</li>
+          <li><strong>Available Balance</strong> - Money you can use to place new bets</li>
+          <li><strong>Locked Balance</strong> - Money tied up in pending bets (returned if you win, lost if you lose)</li>
+        </ul>
+        <p class="text-gray-700 leading-relaxed mt-3">
+          When you place a bet, those funds are locked until the game completes. Winning bets add to your balance;
+          losing bets are deducted. You can view your full transaction history on the Bankroll page.
+        </p>
+      </div>
+    </div>
+
+    <!-- How do I place a bet? -->
+    <div data-controller="collapsible" class="bg-gray-100 border border-gray-300 rounded-lg">
+      <div class="flex items-center p-4 sm:p-5 cursor-pointer select-none hover:bg-gray-200 transition-colors duration-200"
+           data-action="click->collapsible#toggle">
+        <span class="inline-block mr-3 sm:mr-4 text-xs sm:text-sm text-gray-600 transition-transform duration-300"
+              data-collapsible-target="arrow"
+              aria-expanded="false">▶</span>
+        <h3 class="text-base sm:text-lg font-semibold text-gray-800 m-0">How do I place a bet?</h3>
+      </div>
+      <div data-collapsible-target="content" class="border-t border-gray-300 p-4 sm:p-5 bg-white rounded-b-lg">
+        <p class="text-gray-700 leading-relaxed">
+          Browse the upcoming games on the homepage and click on any betting line to open the bet slip. You'll see three types of bets:
+        </p>
+        <ul class="list-disc list-inside text-gray-700 mt-3 space-y-2">
+          <li><strong>Moneyline</strong> - Pick which team wins outright</li>
+          <li><strong>Spread</strong> - Bet on the margin of victory (favorite must win by X points, underdog can lose by less than X)</li>
+          <li><strong>Over/Under (Total)</strong> - Bet on whether the combined score will be over or under a set number</li>
+        </ul>
+        <p class="text-gray-700 leading-relaxed mt-3">
+          After selecting your bet, enter your wager amount (minimum $5) and confirm. The odds are locked in at the moment you place the bet.
+        </p>
+      </div>
+    </div>
+
+    <!-- Understanding American Odds -->
+    <div data-controller="collapsible" class="bg-gray-100 border border-gray-300 rounded-lg">
+      <div class="flex items-center p-4 sm:p-5 cursor-pointer select-none hover:bg-gray-200 transition-colors duration-200"
+           data-action="click->collapsible#toggle">
+        <span class="inline-block mr-3 sm:mr-4 text-xs sm:text-sm text-gray-600 transition-transform duration-300"
+              data-collapsible-target="arrow"
+              aria-expanded="false">▶</span>
+        <h3 class="text-base sm:text-lg font-semibold text-gray-800 m-0">How do American odds work?</h3>
+      </div>
+      <div data-collapsible-target="content" class="border-t border-gray-300 p-4 sm:p-5 bg-white rounded-b-lg">
+        <p class="text-gray-700 leading-relaxed">
+          American odds show how much you can win relative to $100:
+        </p>
+        <ul class="list-disc list-inside text-gray-700 mt-3 space-y-2">
+          <li><strong>Negative odds (e.g., -150)</strong> - The amount you must bet to win $100. A -150 bet means wagering $150 to win $100 profit. This indicates the favorite.</li>
+          <li><strong>Positive odds (e.g., +130)</strong> - The amount you win on a $100 bet. A +130 bet means winning $130 profit on a $100 wager. This indicates the underdog.</li>
+        </ul>
+        <p class="text-gray-700 leading-relaxed mt-3">
+          <strong>Example:</strong> If you bet $50 on a team at +200 odds and win, you profit $100 (plus your $50 stake back).
+          If you bet $50 on a team at -200 odds and win, you profit $25 (plus your $50 stake back).
+        </p>
+      </div>
+    </div>
+
+    <!-- What happens to my bets? -->
+    <div data-controller="collapsible" class="bg-gray-100 border border-gray-300 rounded-lg">
+      <div class="flex items-center p-4 sm:p-5 cursor-pointer select-none hover:bg-gray-200 transition-colors duration-200"
+           data-action="click->collapsible#toggle">
+        <span class="inline-block mr-3 sm:mr-4 text-xs sm:text-sm text-gray-600 transition-transform duration-300"
+              data-collapsible-target="arrow"
+              aria-expanded="false">▶</span>
+        <h3 class="text-base sm:text-lg font-semibold text-gray-800 m-0">What happens after I place a bet?</h3>
+      </div>
+      <div data-collapsible-target="content" class="border-t border-gray-300 p-4 sm:p-5 bg-white rounded-b-lg">
+        <p class="text-gray-700 leading-relaxed">
+          After placing a bet, it moves through these stages:
+        </p>
+        <ul class="list-disc list-inside text-gray-700 mt-3 space-y-2">
+          <li><strong>Pending</strong> - Your bet is waiting for the game to complete. You can cancel pending bets before the game starts.</li>
+          <li><strong>Won</strong> - Your bet was successful! Your winnings are added to your bankroll.</li>
+          <li><strong>Lost</strong> - Your bet didn't hit. The wagered amount is forfeited.</li>
+          <li><strong>Push</strong> - The result was exactly on the line (tie). Your original stake is returned.</li>
+          <li><strong>Canceled</strong> - You canceled the bet before the game started, and your stake was refunded.</li>
+        </ul>
+        <p class="text-gray-700 leading-relaxed mt-3">
+          View all your bets and their statuses on the "My Bets" page.
+        </p>
+      </div>
+    </div>
+
+    <!-- What is the house vig? -->
+    <div data-controller="collapsible" class="bg-gray-100 border border-gray-300 rounded-lg">
+      <div class="flex items-center p-4 sm:p-5 cursor-pointer select-none hover:bg-gray-200 transition-colors duration-200"
+           data-action="click->collapsible#toggle">
+        <span class="inline-block mr-3 sm:mr-4 text-xs sm:text-sm text-gray-600 transition-transform duration-300"
+              data-collapsible-target="arrow"
+              aria-expanded="false">▶</span>
+        <h3 class="text-base sm:text-lg font-semibold text-gray-800 m-0">What is the house vig (vigorish)?</h3>
+      </div>
+      <div data-collapsible-target="content" class="border-t border-gray-300 p-4 sm:p-5 bg-white rounded-b-lg">
+        <p class="text-gray-700 leading-relaxed">
+          The <strong>vig</strong> (short for vigorish, also called "juice") is the commission the house takes on every bet.
+          It's how sportsbooks guarantee profit regardless of outcomes.
+        </p>
+        <p class="text-gray-700 leading-relaxed mt-3">
+          <strong>How it works:</strong> On a standard spread bet, both sides are typically -110. This means you bet $110 to win $100.
+          If two people bet opposite sides of the same game, one wins $100 while the other loses $110.
+          The sportsbook keeps the $10 difference - that's the vig.
+        </p>
+        <p class="text-gray-700 leading-relaxed mt-3">
+          We track the house vig publicly so you can see exactly how much of the betting pool goes to "the house" over time.
+          This transparency helps you understand why consistent winning requires more than just picking 50% of your bets correctly.
+        </p>
+        <div class="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+          <p class="text-gray-600 text-sm">
+            <strong>Did you know?</strong> To break even with standard -110 odds, you need to win approximately 52.4% of your bets.
+            The vig is why long-term profitable sports betting is so challenging!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- How does the leaderboard work? -->
+    <div data-controller="collapsible" class="bg-gray-100 border border-gray-300 rounded-lg">
+      <div class="flex items-center p-4 sm:p-5 cursor-pointer select-none hover:bg-gray-200 transition-colors duration-200"
+           data-action="click->collapsible#toggle">
+        <span class="inline-block mr-3 sm:mr-4 text-xs sm:text-sm text-gray-600 transition-transform duration-300"
+              data-collapsible-target="arrow"
+              aria-expanded="false">▶</span>
+        <h3 class="text-base sm:text-lg font-semibold text-gray-800 m-0">How does the leaderboard work?</h3>
+      </div>
+      <div data-collapsible-target="content" class="border-t border-gray-300 p-4 sm:p-5 bg-white rounded-b-lg">
+        <p class="text-gray-700 leading-relaxed">
+          The leaderboard ranks all players based on their total returns. Everyone starts with the same $5,000,
+          so the rankings reflect pure betting skill and strategy.
+        </p>
+        <p class="text-gray-700 leading-relaxed mt-3">
+          Compete against friends and other players to see who can grow their bankroll the most.
+          It's a fun way to test your sports knowledge and betting strategies against others without any financial risk.
+        </p>
+      </div>
+    </div>
+
+    <!-- Is this real money? -->
+    <div data-controller="collapsible" class="bg-gray-100 border border-gray-300 rounded-lg">
+      <div class="flex items-center p-4 sm:p-5 cursor-pointer select-none hover:bg-gray-200 transition-colors duration-200"
+           data-action="click->collapsible#toggle">
+        <span class="inline-block mr-3 sm:mr-4 text-xs sm:text-sm text-gray-600 transition-transform duration-300"
+              data-collapsible-target="arrow"
+              aria-expanded="false">▶</span>
+        <h3 class="text-base sm:text-lg font-semibold text-gray-800 m-0">Is this real money? Can I withdraw winnings?</h3>
+      </div>
+      <div data-collapsible-target="content" class="border-t border-gray-300 p-4 sm:p-5 bg-white rounded-b-lg">
+        <p class="text-gray-700 leading-relaxed">
+          <strong>No, this is not real money.</strong> Hideaway Sports Book uses play money only. You cannot deposit real funds,
+          and you cannot withdraw any winnings. This is purely a simulation for entertainment and educational purposes.
+        </p>
+        <p class="text-gray-700 leading-relaxed mt-3">
+          Think of it like Monopoly money - it's fun to win, but it has no real-world value.
+          The goal is to learn about sports betting mechanics and have fun competing with others,
+          without any financial risk or consequences.
+        </p>
+      </div>
+    </div>
+
+    <!-- Where do the odds come from? -->
+    <div data-controller="collapsible" class="bg-gray-100 border border-gray-300 rounded-lg">
+      <div class="flex items-center p-4 sm:p-5 cursor-pointer select-none hover:bg-gray-200 transition-colors duration-200"
+           data-action="click->collapsible#toggle">
+        <span class="inline-block mr-3 sm:mr-4 text-xs sm:text-sm text-gray-600 transition-transform duration-300"
+              data-collapsible-target="arrow"
+              aria-expanded="false">▶</span>
+        <h3 class="text-base sm:text-lg font-semibold text-gray-800 m-0">Where do the odds come from?</h3>
+      </div>
+      <div data-collapsible-target="content" class="border-t border-gray-300 p-4 sm:p-5 bg-white rounded-b-lg">
+        <p class="text-gray-700 leading-relaxed">
+          We pull real betting odds from <strong>The Odds API</strong>, which aggregates lines from major sportsbooks.
+          This means you're seeing and betting on the same odds that real money bettors use.
+        </p>
+        <p class="text-gray-700 leading-relaxed mt-3">
+          Odds are synced automatically throughout the day to keep them fresh:
+        </p>
+        <ul class="list-disc list-inside text-gray-700 mt-3 space-y-2">
+          <li><strong>Live games</strong> - Updated every few minutes</li>
+          <li><strong>Upcoming games</strong> - Updated hourly</li>
+          <li><strong>Future games</strong> - Updated daily</li>
+        </ul>
+        <p class="text-gray-700 leading-relaxed mt-3">
+          Using real odds makes this simulation as authentic as possible, giving you genuine practice for understanding
+          how betting lines move and what value looks like.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
