@@ -16,7 +16,7 @@ module PaymentAdapters
     # @param currency [String] Currency code
     # @param options [Hash] Must include :customer_id
     # @return [Hash] Payment result
-    def charge(amount, currency: 'USD', **options)
+    def charge(amount, currency: "USD", **options)
       # Validate inputs first (let ArgumentError bubble up)
       validate_amount!(amount)
       customer_id = options[:customer_id]
@@ -29,19 +29,27 @@ module PaymentAdapters
         currency: currency
       )
 
-      # For paper trading deposits, we don't check balance - unlimited fake money!
+      # Check sufficient funds for charge (taking money from customer)
+      if account.balance < amount
+        return error_response(
+          "Insufficient funds. Balance: #{account.balance}, Required: #{amount}",
+          balance: account.balance,
+          required: amount
+        )
+      end
+
       # Create transaction record
       transaction = PaperTradingTransaction.create!(
         paper_trading_account: account,
-        transaction_type: 'charge',
+        transaction_type: "charge",
         amount: amount,
         currency: currency,
         transaction_id: generate_transaction_id,
         metadata: options[:metadata] || {}
       )
 
-      # Credit account (add funds for deposit)
-      account.credit!(amount)
+      # Debit account (take funds from customer for charge)
+      account.debit!(amount)
 
       success_response(
         transaction_id: transaction.transaction_id,
@@ -65,7 +73,7 @@ module PaymentAdapters
       # Find original transaction
       original = PaperTradingTransaction.find_by!(transaction_id: transaction_id)
 
-      unless original.transaction_type == 'charge'
+      unless original.transaction_type == "charge"
         return error_response("Cannot refund a #{original.transaction_type} transaction")
       end
 
@@ -85,7 +93,7 @@ module PaymentAdapters
       # Create refund transaction
       refund_transaction = PaperTradingTransaction.create!(
         paper_trading_account: account,
-        transaction_type: 'refund',
+        transaction_type: "refund",
         amount: refund_amount,
         currency: original.currency,
         transaction_id: generate_transaction_id,
@@ -109,44 +117,35 @@ module PaymentAdapters
       error_response("Refund failed: #{e.message}")
     end
 
-    # Withdraw funds from paper trading account (remove funds)
-    # @param amount [Numeric] Amount to withdraw
+    # Withdraw funds to paper trading account (payout to customer)
+    # @param amount [Numeric] Amount to pay out
     # @param currency [String] Currency code
     # @param options [Hash] Must include :customer_id
     # @return [Hash] Withdrawal result
-    def withdraw(amount, currency: 'USD', **options)
+    def withdraw(amount, currency: "USD", **options)
       # Validate inputs first (let ArgumentError bubble up)
       validate_amount!(amount)
       customer_id = options[:customer_id]
       raise ArgumentError, "customer_id is required" unless customer_id
 
-      # Find existing account (must exist - can't withdraw from non-existent account)
+      # Find existing account (must exist - can't payout to non-existent account)
       account = PaperTradingAccount.find_by(customer_id: customer_id)
       unless account
         return error_response("No payment account found for customer #{customer_id}. Please make a deposit first.")
       end
 
-      # Check sufficient funds for withdrawal
-      if account.balance < amount
-        return error_response(
-          "Insufficient funds for withdrawal. Balance: #{account.balance}, Required: #{amount}",
-          balance: account.balance,
-          required: amount
-        )
-      end
-
       # Create withdrawal transaction
       withdrawal_transaction = PaperTradingTransaction.create!(
         paper_trading_account: account,
-        transaction_type: 'withdrawal',
+        transaction_type: "withdrawal",
         amount: amount,
         currency: currency,
         transaction_id: generate_transaction_id,
         metadata: options[:metadata] || {}
       )
 
-      # Debit account (remove funds for withdrawal)
-      account.debit!(amount)
+      # Credit account (payout funds to customer)
+      account.credit!(amount)
 
       success_response(
         withdrawal_id: withdrawal_transaction.transaction_id,
@@ -157,8 +156,6 @@ module PaymentAdapters
       )
     rescue ArgumentError
       raise  # Let ArgumentError bubble up for caller to handle
-    rescue InsufficientFundsError => e
-      error_response(e.message, balance: account&.balance)
     rescue StandardError => e
       error_response("Withdrawal failed: #{e.message}")
     end
@@ -188,7 +185,7 @@ module PaymentAdapters
       customer_id = customer_data[:customer_id] || customer_data[:id]
       raise ArgumentError, "customer_id is required" unless customer_id
 
-      currency = customer_data[:currency] || 'USD'
+      currency = customer_data[:currency] || "USD"
       starting_balance = customer_data[:starting_balance] || @starting_balance
 
       account = PaperTradingAccount.find_or_create_for_customer(
@@ -217,7 +214,7 @@ module PaymentAdapters
     protected
 
     def supported_features
-      [:charge, :refund, :withdraw, :balance, :customer_creation, :instant_settlement, :zero_fees]
+      [ :charge, :refund, :withdraw, :balance, :customer_creation, :instant_settlement, :zero_fees ]
     end
 
     def validate_configuration!
