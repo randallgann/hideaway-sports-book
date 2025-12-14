@@ -3,7 +3,7 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
-         :omniauthable, omniauth_providers: [:google_oauth2, :github]
+         :omniauthable, omniauth_providers: [ :google_oauth2, :github ]
 
 
   # Associations
@@ -35,6 +35,9 @@ class User < ApplicationRecord
   private
 
   def create_default_bankroll
-    create_bankroll!(currency: 'USD')
+    create_bankroll!(
+      currency: "USD",
+      available_balance: Bankroll::INITIAL_BALANCE
+    )
   end
 end

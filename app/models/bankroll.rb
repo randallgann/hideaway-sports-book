@@ -7,7 +7,10 @@ class Bankroll < ApplicationRecord
   validates :currency, presence: true
   validates :payment_processor, presence: true
 
-  # Business rule constants
+  # Initial balance for new users (paper trading)
+  INITIAL_BALANCE = 5000.00
+
+  # Business rule constants (kept for future use)
   MIN_DEPOSIT = 10.00
   MIN_WITHDRAWAL = 20.00
   MAX_TRANSACTION = 10_000.00
@@ -46,7 +49,7 @@ class Bankroll < ApplicationRecord
 
     # Record transaction
     transaction = bankroll_transactions.create!(
-      transaction_type: 'deposit',
+      transaction_type: "deposit",
       amount: amount,
       balance_before: balance_before,
       balance_after: available_balance,
@@ -97,7 +100,7 @@ class Bankroll < ApplicationRecord
 
     # Record transaction
     transaction = bankroll_transactions.create!(
-      transaction_type: 'withdrawal',
+      transaction_type: "withdrawal",
       amount: amount,
       balance_before: balance_before,
       balance_after: available_balance,
@@ -136,7 +139,7 @@ class Bankroll < ApplicationRecord
 
     # Record transaction
     transaction = bankroll_transactions.create!(
-      transaction_type: 'bet_placed',
+      transaction_type: "bet_placed",
       amount: amount,
       balance_before: balance_before,
       balance_after: available_balance,
@@ -175,7 +178,7 @@ class Bankroll < ApplicationRecord
 
     # Record transaction
     transaction = bankroll_transactions.create!(
-      transaction_type: 'bet_won',
+      transaction_type: "bet_won",
       amount: payout_amount,
       balance_before: balance_before,
       balance_after: available_balance,
@@ -213,7 +216,7 @@ class Bankroll < ApplicationRecord
 
     # Record transaction
     transaction = bankroll_transactions.create!(
-      transaction_type: 'bet_lost',
+      transaction_type: "bet_lost",
       amount: bet_amount,
       balance_before: balance_before,
       balance_after: available_balance,
@@ -251,7 +254,7 @@ class Bankroll < ApplicationRecord
 
     # Record transaction
     transaction = bankroll_transactions.create!(
-      transaction_type: 'bet_canceled',
+      transaction_type: "bet_canceled",
       amount: bet_amount,
       balance_before: balance_before,
       balance_after: available_balance,
@@ -290,7 +293,7 @@ class Bankroll < ApplicationRecord
 
     # Record transaction
     transaction = bankroll_transactions.create!(
-      transaction_type: 'bet_push',
+      transaction_type: "bet_push",
       amount: bet_amount,
       balance_before: balance_before,
       balance_after: available_balance,
@@ -328,9 +331,9 @@ class Bankroll < ApplicationRecord
       currency: currency,
       total_deposits: bankroll_transactions.deposits.sum(:amount),
       total_withdrawals: bankroll_transactions.withdrawals.sum(:amount),
-      total_bets_placed: bankroll_transactions.where(transaction_type: 'bet_placed').count,
-      total_bets_won: bankroll_transactions.where(transaction_type: 'bet_won').count,
-      total_bets_lost: bankroll_transactions.where(transaction_type: 'bet_lost').count,
+      total_bets_placed: bankroll_transactions.where(transaction_type: "bet_placed").count,
+      total_bets_won: bankroll_transactions.where(transaction_type: "bet_won").count,
+      total_bets_lost: bankroll_transactions.where(transaction_type: "bet_lost").count,
       net_profit: calculate_net_profit
     }
   end
@@ -344,8 +347,8 @@ class Bankroll < ApplicationRecord
 
   # Calculate net profit from betting (not including deposits/withdrawals)
   def calculate_net_profit
-    winnings = bankroll_transactions.where(transaction_type: 'bet_won').sum(:amount)
-    losses = bankroll_transactions.where(transaction_type: 'bet_lost').sum(:amount)
+    winnings = bankroll_transactions.where(transaction_type: "bet_won").sum(:amount)
+    losses = bankroll_transactions.where(transaction_type: "bet_lost").sum(:amount)
     winnings - losses
   end
 

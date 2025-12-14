@@ -7,6 +7,9 @@ Rails.application.routes.draw do
   # Games routes
   resources :games, only: [:index]
 
+  # Static pages
+  get "faq", to: "pages#faq"
+
   # Bankroll routes
   resource :bankroll, only: [:show] do
     post :deposit

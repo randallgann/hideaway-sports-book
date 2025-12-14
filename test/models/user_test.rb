@@ -142,51 +142,64 @@ class UserTest < ActiveSupport::TestCase
     )
     bankroll = user.bankroll
 
-    assert_equal 0.0, bankroll.available_balance
+    assert_equal Bankroll::INITIAL_BALANCE, bankroll.available_balance
     assert_equal 0.0, bankroll.locked_balance
-    assert_equal 'USD', bankroll.currency
-    assert_equal 'paper_trading', bankroll.payment_processor
+    assert_equal "USD", bankroll.currency
+    assert_equal "paper_trading", bankroll.payment_processor
+  end
+
+  test "new user receives initial bankroll of $5000" do
+    user = User.create!(
+      email: "newuser@example.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
+
+    assert_not_nil user.bankroll
+    assert_equal 5000.00, user.bankroll.available_balance
+    assert_equal 0.00, user.bankroll.locked_balance
+    assert_equal "USD", user.bankroll.currency
   end
 
   test "from_omniauth creates new user with OAuth data" do
     auth = OpenStruct.new(
-      provider: 'google_oauth2',
-      uid: '12345',
+      provider: "google_oauth2",
+      uid: "12345",
       info: OpenStruct.new(
-        email: 'oauth@example.com',
-        name: 'Test User',
-        nickname: 'testuser'
+        email: "oauth@example.com",
+        name: "Test User",
+        nickname: "testuser"
       )
     )
 
     user = User.from_omniauth(auth)
 
     assert user.persisted?
-    assert_equal 'google_oauth2', user.provider
-    assert_equal '12345', user.uid
-    assert_equal 'oauth@example.com', user.email
-    assert_equal 'Test User', user.name
-    assert_equal 'testuser', user.username
+    assert_equal "google_oauth2", user.provider
+    assert_equal "12345", user.uid
+    assert_equal "oauth@example.com", user.email
+    assert_equal "Test User", user.name
+    assert_equal "testuser", user.username
   end
 
   test "from_omniauth finds existing user" do
     existing_user = User.create!(
-      provider: 'google_oauth2',
-      uid: '12345',
-      email: 'existing@example.com',
-      password: 'password123',
-      password_confirmation: 'password123'
+      provider: "google_oauth2",
+      uid: "12345",
+      email: "existing@example.com",
+      password: "password123",
+      password_confirmation: "password123"
     )
 
     auth = OpenStruct.new(
-      provider: 'google_oauth2',
-      uid: '12345',
-      info: OpenStruct.new(email: 'newemail@example.com')
+      provider: "google_oauth2",
+      uid: "12345",
+      info: OpenStruct.new(email: "newemail@example.com")
     )
 
     user = User.from_omniauth(auth)
 
     assert_equal existing_user.id, user.id
-    assert_equal 'existing@example.com', user.email # Should not update
+    assert_equal "existing@example.com", user.email # Should not update
   end
 end

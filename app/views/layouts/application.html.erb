@@ -49,6 +49,7 @@
 
           <!-- Desktop navigation with better spacing -->
           <div class="hidden md:flex md:items-center md:gap-3 lg:gap-4">
+            <%= link_to "FAQ", faq_path, class: "px-4 py-2 text-sm font-semibold text-white hover:text-[#4CAF50] transition-colors duration-200" %>
             <% if user_signed_in? %>
               <%= link_to "My Bets", bets_path, class: "px-4 py-2 text-sm font-semibold text-white hover:text-[#4CAF50] transition-colors duration-200" %>
               <span class="text-white text-sm mr-2 hidden lg:inline">Welcome, <%= current_user.name || current_user.email %>!</span>
@@ -68,6 +69,7 @@
         <!-- Mobile menu (hidden by default) with better padding -->
         <div class="md:hidden hidden" data-mobile-menu-target="menu">
           <div class="px-4 pt-4 pb-4 border-t border-gray-700" style="margin-top: 0.5rem;">
+            <%= link_to "FAQ", faq_path, class: "block w-full px-4 py-3 text-sm font-semibold text-center text-white bg-gray-700 rounded-lg hover:bg-gray-600 transition-all duration-200", style: "margin-bottom: 1rem;" %>
             <% if user_signed_in? %>
               <div class="text-white text-sm px-4 py-3 bg-gray-800 rounded-lg" style="margin-bottom: 1rem;">
                 Welcome, <%= current_user.name || current_user.email %>!
