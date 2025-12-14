@@ -151,4 +151,9 @@ BettingLine.create!(
 )
 
 puts "Created #{BettingLine.count} betting lines"
+
+# Create or find house user (singleton)
+house_user = User.house
+puts "House user created/found: #{house_user.name} with balance $#{house_user.bankroll.total_balance}"
+
 puts "Seed data loaded successfully!"

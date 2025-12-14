@@ -3,7 +3,7 @@ class JobExecution < ApplicationRecord
   validates :executed_at, presence: true
 
   # Record a job execution
-  def self.record(job_name, status: 'success', executed_at: Time.current)
+  def self.record(job_name, status: "success", executed_at: Time.current)
     create!(
       job_name: job_name,
       executed_at: executed_at,

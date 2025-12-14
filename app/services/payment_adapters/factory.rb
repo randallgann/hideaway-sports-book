@@ -6,9 +6,9 @@ module PaymentAdapters
     class AdapterNotFoundError < StandardError; end
 
     ADAPTERS = {
-      paper_trading: 'PaymentAdapters::PaperTradingAdapter',
-      stripe: 'PaymentAdapters::StripeAdapter',
-      paypal: 'PaymentAdapters::PaypalAdapter'
+      paper_trading: "PaymentAdapters::PaperTradingAdapter",
+      stripe: "PaymentAdapters::StripeAdapter",
+      paypal: "PaymentAdapters::PaypalAdapter"
     }.freeze
 
     class << self
@@ -47,7 +47,7 @@ module PaymentAdapters
       #   adapter = PaymentAdapters::Factory.create_from_env
       #
       def create_from_env(config = {})
-        processor = ENV.fetch('PAYMENT_PROCESSOR', 'paper_trading').to_sym
+        processor = ENV.fetch("PAYMENT_PROCESSOR", "paper_trading").to_sym
         create(processor, config)
       end
 

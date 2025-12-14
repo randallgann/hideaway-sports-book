@@ -1,14 +1,14 @@
 class BetsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_bet, only: [:show, :cancel]
+  before_action :set_bet, only: [ :show, :cancel ]
 
   def index
     @pending_bets = current_user.bets.pending
-                                .includes(game: [:home_team, :away_team], betting_line: :game)
+                                .includes(game: [ :home_team, :away_team ], betting_line: :game)
                                 .order(created_at: :desc)
 
     @settled_bets = current_user.bets.settled
-                                .includes(game: [:home_team, :away_team], betting_line: :game)
+                                .includes(game: [ :home_team, :away_team ], betting_line: :game)
                                 .order(settled_at: :desc)
                                 .limit(50)
   end
@@ -19,7 +19,7 @@ class BetsController < ApplicationController
 
   def cancel
     # Validate bet is still pending
-    unless @bet.status == 'pending'
+    unless @bet.status == "pending"
       redirect_to bets_path, alert: "Can only cancel pending bets" and return
     end
 
@@ -32,7 +32,7 @@ class BetsController < ApplicationController
     result = current_user.bankroll.cancel_bet(@bet.id, @bet.amount)
 
     if result[:success]
-      @bet.update!(status: 'canceled')
+      @bet.update!(status: "canceled")
       redirect_to bets_path, notice: "Bet canceled successfully - funds returned to your account"
     else
       redirect_to bet_path(@bet), alert: result[:message]

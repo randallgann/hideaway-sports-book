@@ -10,7 +10,7 @@ class PaperTradingTransaction < ApplicationRecord
 
   serialize :metadata, coder: JSON
 
-  scope :charges, -> { where(transaction_type: 'charge') }
-  scope :refunds, -> { where(transaction_type: 'refund') }
-  scope :withdrawals, -> { where(transaction_type: 'withdrawal') }
+  scope :charges, -> { where(transaction_type: "charge") }
+  scope :refunds, -> { where(transaction_type: "refund") }
+  scope :withdrawals, -> { where(transaction_type: "withdrawal") }
 end

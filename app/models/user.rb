@@ -13,6 +13,16 @@ class User < ApplicationRecord
   # Validations
   validates :username, uniqueness: true, allow_nil: true
   validates :email, uniqueness: true, if: -> { provider.blank? }
+  validates :house, uniqueness: true, if: :house?
+
+  # Singleton pattern for house user
+  def self.house
+    find_or_create_by!(house: true) do |user|
+      user.email = "house@hideaway.local"
+      user.password = SecureRandom.hex(32)
+      user.name = "The House"
+    end
+  end
 
   # Callback to create bankroll when user is created
   after_create :create_default_bankroll

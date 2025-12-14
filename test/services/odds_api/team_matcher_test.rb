@@ -19,7 +19,7 @@ class OddsApi::TeamMatcherTest < ActiveSupport::TestCase
   end
 
   test "creates new team when no match found" do
-    assert_difference 'Team.count', 1 do
+    assert_difference "Team.count", 1 do
       team = @matcher.find_or_create_team("Boston Celtics", "basketball_nba", external_id: "api_celtics_123")
       assert_equal "Celtics", team.name
       assert_equal "Boston", team.city
@@ -87,7 +87,7 @@ class OddsApi::TeamMatcherTest < ActiveSupport::TestCase
     team1 = @matcher.find_or_create_team("Boston Celtics", "basketball_nba", external_id: "api_celtics_123")
 
     # Second call should find the existing team
-    assert_no_difference 'Team.count' do
+    assert_no_difference "Team.count" do
       team2 = @matcher.find_or_create_team("Boston Celtics", "basketball_nba", external_id: "api_celtics_123")
       assert_equal team1.id, team2.id
     end

@@ -1,0 +1,129 @@
+<div class="max-w-4xl mx-auto">
+  <!-- Page Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl sm:text-4xl font-bold text-yellow-500 mb-2">The House</h1>
+    <p class="text-gray-400">Track how much vigorish (vig) the house has collected from betting operations</p>
+  </div>
+
+  <!-- Info Message about vig -->
+  <div class="bg-yellow-900/30 border border-yellow-700 rounded-lg p-4 sm:p-5 mb-8">
+    <p class="text-yellow-200 text-sm sm:text-base">
+      <strong>What is vigorish?</strong> The vig (or "juice") is the commission built into the odds.
+      When a bet is lost, the house keeps the full bet amount. This transparency shows how the house edge
+      accumulates over time - helping you understand why consistent winning requires beating more than just 50/50 odds.
+    </p>
+  </div>
+
+  <!-- House Balance Card -->
+  <div class="bg-[#1a1a2e] rounded-lg shadow-lg p-6 sm:p-8 mb-8 border border-yellow-700">
+    <div class="text-center">
+      <h2 class="text-lg text-gray-400 mb-2">House Total Balance</h2>
+      <p class="text-5xl sm:text-6xl font-bold text-yellow-500 mb-4">
+        <%= number_to_currency(@bankroll.total_balance, precision: 2) %>
+      </p>
+
+      <div class="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-gray-700">
+        <div>
+          <p class="text-sm text-gray-400 mb-1">Available</p>
+          <p class="text-2xl font-semibold text-white">
+            <%= number_to_currency(@bankroll.available_balance, precision: 2) %>
+          </p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-400 mb-1">Starting Balance</p>
+          <p class="text-2xl font-semibold text-white">
+            <%= number_to_currency(Bankroll::INITIAL_BALANCE, precision: 2) %>
+          </p>
+        </div>
+      </div>
+
+      <!-- Net Vig Collected -->
+      <div class="mt-6 pt-6 border-t border-gray-700">
+        <p class="text-sm text-gray-400 mb-1">Net Vig Collected</p>
+        <% net_vig = @bankroll.total_balance - Bankroll::INITIAL_BALANCE %>
+        <p class="text-3xl font-bold <%= net_vig >= 0 ? 'text-green-400' : 'text-red-400' %>">
+          <%= net_vig >= 0 ? '+' : '' %><%= number_to_currency(net_vig, precision: 2) %>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics -->
+  <div class="bg-[#1a1a2e] rounded-lg shadow-lg p-6 border border-gray-700 mb-8">
+    <h3 class="text-xl font-bold text-white mb-4">House Statistics</h3>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div class="text-center p-4 bg-gray-800 rounded-lg">
+        <p class="text-2xl font-bold text-yellow-500"><%= @stats[:total_bets_won] %></p>
+        <p class="text-sm text-gray-400">Vig Received</p>
+      </div>
+      <div class="text-center p-4 bg-gray-800 rounded-lg">
+        <p class="text-2xl font-bold text-white">
+          <%= number_to_currency(@bankroll.bankroll_transactions.where(transaction_type: 'vig_received').sum(:amount), precision: 2) %>
+        </p>
+        <p class="text-sm text-gray-400">Total Vig Amount</p>
+      </div>
+      <div class="text-center p-4 bg-gray-800 rounded-lg">
+        <p class="text-2xl font-bold text-white"><%= @recent_transactions.count %></p>
+        <p class="text-sm text-gray-400">Recent Transactions</p>
+      </div>
+      <div class="text-center p-4 bg-gray-800 rounded-lg">
+        <% avg_vig = @bankroll.bankroll_transactions.where(transaction_type: 'vig_received').average(:amount) || 0 %>
+        <p class="text-2xl font-bold text-white"><%= number_to_currency(avg_vig, precision: 2) %></p>
+        <p class="text-sm text-gray-400">Avg Vig per Bet</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Transactions -->
+  <% if @recent_transactions.any? %>
+    <div class="bg-[#1a1a2e] rounded-lg shadow-lg p-6 border border-gray-700">
+      <h3 class="text-xl font-bold text-white mb-4">Recent Vig Transactions</h3>
+
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-gray-700">
+              <th class="text-left py-3 px-4 text-sm font-semibold text-gray-400">Date</th>
+              <th class="text-left py-3 px-4 text-sm font-semibold text-gray-400">Type</th>
+              <th class="text-left py-3 px-4 text-sm font-semibold text-gray-400">Description</th>
+              <th class="text-right py-3 px-4 text-sm font-semibold text-gray-400">Amount</th>
+              <th class="text-right py-3 px-4 text-sm font-semibold text-gray-400">Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @recent_transactions.each do |transaction| %>
+              <tr class="border-b border-gray-800 hover:bg-[#0f0f1e] transition-colors">
+                <td class="py-3 px-4 text-sm text-gray-300">
+                  <%= transaction.created_at.strftime("%b %d, %Y %I:%M %p") %>
+                </td>
+                <td class="py-3 px-4">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                    <%= case transaction.transaction_type
+                        when 'vig_received' then 'bg-yellow-900 text-yellow-300'
+                        when 'deposit' then 'bg-green-900 text-green-300'
+                        else 'bg-gray-700 text-gray-300'
+                        end %>">
+                    <%= transaction.transaction_type.titleize %>
+                  </span>
+                </td>
+                <td class="py-3 px-4 text-sm text-gray-300">
+                  <%= transaction.description || '-' %>
+                </td>
+                <td class="py-3 px-4 text-right text-sm font-semibold text-green-400">
+                  +<%= number_to_currency(transaction.amount, precision: 2) %>
+                </td>
+                <td class="py-3 px-4 text-right text-sm text-gray-300">
+                  <%= number_to_currency(transaction.balance_after, precision: 2) %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% else %>
+    <div class="bg-[#1a1a2e] rounded-lg shadow-lg p-8 border border-gray-700 text-center">
+      <p class="text-gray-400">No transactions yet. The house will collect vig when bets are settled!</p>
+    </div>
+  <% end %>
+</div>

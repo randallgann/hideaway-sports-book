@@ -41,10 +41,10 @@ class Bet < ApplicationRecord
   end
 
   # Scopes
-  scope :pending, -> { where(status: 'pending') }
+  scope :pending, -> { where(status: "pending") }
   scope :settled, -> { where(status: %w[won lost push]) }
-  scope :won, -> { where(status: 'won') }
-  scope :lost, -> { where(status: 'lost') }
+  scope :won, -> { where(status: "won") }
+  scope :lost, -> { where(status: "lost") }
   scope :for_user, ->(user_id) { where(user_id: user_id) }
   scope :for_game, ->(game_id) { where(game_id: game_id) }
   scope :recent, ->(limit = 10) { order(created_at: :desc).limit(limit) }
@@ -89,28 +89,28 @@ class Bet < ApplicationRecord
     return unless betting_line && selection
 
     case betting_line.line_type
-    when 'moneyline'
-      self.odds_at_placement = selection == 'home' ? betting_line.home_odds : betting_line.away_odds
-    when 'spread'
-      self.odds_at_placement = selection == 'home' ? betting_line.home_odds : betting_line.away_odds
+    when "moneyline"
+      self.odds_at_placement = selection == "home" ? betting_line.home_odds : betting_line.away_odds
+    when "spread"
+      self.odds_at_placement = selection == "home" ? betting_line.home_odds : betting_line.away_odds
       self.line_value_at_placement = betting_line.spread
-    when 'over_under'
-      self.odds_at_placement = selection == 'over' ? betting_line.over_odds : betting_line.under_odds
+    when "over_under"
+      self.odds_at_placement = selection == "over" ? betting_line.over_odds : betting_line.under_odds
       self.line_value_at_placement = betting_line.total
     end
   end
 
   # Determine bet result based on final score
   def determine_result
-    return nil unless game.status == 'completed'
+    return nil unless game.status == "completed"
     return nil unless game.home_score && game.away_score
 
     case betting_line.line_type
-    when 'moneyline'
+    when "moneyline"
       check_moneyline_result
-    when 'spread'
+    when "spread"
       check_spread_result
-    when 'over_under'
+    when "over_under"
       check_over_under_result
     end
   end
@@ -122,11 +122,11 @@ class Bet < ApplicationRecord
 
     transaction do
       case result
-      when 'won'
+      when "won"
         settle_win
-      when 'lost'
+      when "lost"
         settle_loss
-      when 'push'
+      when "push"
         settle_push
       end
     end
@@ -135,15 +135,15 @@ class Bet < ApplicationRecord
   private
 
   def check_moneyline_result
-    return 'push' if game.home_score == game.away_score
+    return "push" if game.home_score == game.away_score
 
-    winner = game.home_score > game.away_score ? 'home' : 'away'
-    selection == winner ? 'won' : 'lost'
+    winner = game.home_score > game.away_score ? "home" : "away"
+    selection == winner ? "won" : "lost"
   end
 
   def check_spread_result
     # Apply spread to selected team's score
-    if selection == 'home'
+    if selection == "home"
       adjusted_score = game.home_score + line_value_at_placement
       result_score = game.away_score
     else
@@ -152,19 +152,19 @@ class Bet < ApplicationRecord
     end
 
     # Check if bet covered the spread
-    return 'push' if adjusted_score == result_score
-    adjusted_score > result_score ? 'won' : 'lost'
+    return "push" if adjusted_score == result_score
+    adjusted_score > result_score ? "won" : "lost"
   end
 
   def check_over_under_result
     total_points = game.home_score + game.away_score
 
-    return 'push' if total_points == line_value_at_placement
+    return "push" if total_points == line_value_at_placement
 
-    if selection == 'over'
-      total_points > line_value_at_placement ? 'won' : 'lost'
+    if selection == "over"
+      total_points > line_value_at_placement ? "won" : "lost"
     else
-      total_points < line_value_at_placement ? 'won' : 'lost'
+      total_points < line_value_at_placement ? "won" : "lost"
     end
   end
 
@@ -172,7 +172,7 @@ class Bet < ApplicationRecord
     result = user.bankroll.settle_bet_win(id, amount, potential_payout)
     if result[:success]
       update!(
-        status: 'won',
+        status: "won",
         actual_payout: potential_payout,
         settled_at: Time.current,
         settlement_notes: "Bet won - payout: #{potential_payout}"
@@ -184,7 +184,7 @@ class Bet < ApplicationRecord
     result = user.bankroll.settle_bet_loss(id, amount)
     if result[:success]
       update!(
-        status: 'lost',
+        status: "lost",
         actual_payout: 0,
         settled_at: Time.current,
         settlement_notes: "Bet lost"
@@ -196,7 +196,7 @@ class Bet < ApplicationRecord
     result = user.bankroll.settle_bet_push(id, amount)
     if result[:success]
       update!(
-        status: 'push',
+        status: "push",
         actual_payout: amount,
         settled_at: Time.current,
         settlement_notes: "Push - stake returned"

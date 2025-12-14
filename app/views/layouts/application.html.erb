@@ -35,6 +35,10 @@
 
           <!-- Mobile menu button with proper padding -->
           <div class="md:hidden flex items-center gap-3">
+            <!-- House Balance (mobile) -->
+            <%= link_to house_path, class: "text-yellow-500 text-sm font-bold hover:text-yellow-400 transition-colors duration-200" do %>
+              <span class="text-xs">H:</span><%= number_to_currency(User.house.bankroll&.total_balance || 0, precision: 0) %>
+            <% end %>
             <% if user_signed_in? && current_user.bankroll %>
               <%= link_to bankroll_path, class: "text-[#4CAF50] text-base font-bold hover:text-[#45a049] transition-colors duration-200" do %>
                 <%= number_to_currency(current_user.bankroll.total_balance, precision: 2) %>
@@ -49,6 +53,11 @@
 
           <!-- Desktop navigation with better spacing -->
           <div class="hidden md:flex md:items-center md:gap-3 lg:gap-4">
+            <!-- House Balance (always visible) -->
+            <%= link_to house_path, class: "text-yellow-500 text-base font-bold hover:text-yellow-400 transition-colors duration-200 flex items-center gap-1" do %>
+              <span class="text-xs uppercase">House</span>
+              <%= number_to_currency(User.house.bankroll&.total_balance || 0, precision: 2) %>
+            <% end %>
             <%= link_to "FAQ", faq_path, class: "px-4 py-2 text-sm font-semibold text-white hover:text-[#4CAF50] transition-colors duration-200" %>
             <% if user_signed_in? %>
               <%= link_to "My Bets", bets_path, class: "px-4 py-2 text-sm font-semibold text-white hover:text-[#4CAF50] transition-colors duration-200" %>

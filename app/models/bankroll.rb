@@ -275,6 +275,38 @@ class Bankroll < ApplicationRecord
     error_result("Failed to cancel bet: #{e.message}")
   end
 
+  # Receive vigorish from a lost bet (house account only)
+  # @param amount [Numeric] Vig amount to receive
+  # @param bet_id [String, Integer] Bet identifier
+  # @param options [Hash] Additional options
+  # @return [Hash] Result with :success, :transaction, :message
+  def receive_vig(amount, bet_id, **options)
+    return error_result("Vig amount must be positive") unless amount > 0
+
+    balance_before = available_balance
+    self.available_balance += amount
+
+    transaction = bankroll_transactions.create!(
+      transaction_type: "vig_received",
+      amount: amount,
+      balance_before: balance_before,
+      balance_after: available_balance,
+      reference_id: bet_id.to_s,
+      description: "Vig from lost bet ##{bet_id}",
+      metadata: options[:metadata] || {}
+    )
+
+    save!
+
+    success_result(
+      transaction: transaction,
+      available_balance: available_balance,
+      message: "Received #{amount} #{currency} in vig"
+    )
+  rescue StandardError => e
+    error_result("Failed to receive vig: #{e.message}")
+  end
+
   # Settle a push (tie) - return original bet
   # @param bet_id [String, Integer] Bet identifier
   # @param bet_amount [Numeric] Original bet amount

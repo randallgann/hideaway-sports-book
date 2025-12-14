@@ -9,7 +9,7 @@ class OddsApi::SportsSyncTest < ActiveSupport::TestCase
   end
 
   test "syncs odds for a single sport" do
-    stub_odds_request("basketball_nba", [build_api_event])
+    stub_odds_request("basketball_nba", [ build_api_event ])
 
     result = @sync.sync_sport("basketball_nba")
 
@@ -21,10 +21,10 @@ class OddsApi::SportsSyncTest < ActiveSupport::TestCase
   end
 
   test "syncs multiple sports" do
-    stub_odds_request("basketball_nba", [build_api_event(id: "nba_game")])
-    stub_odds_request("americanfootball_nfl", [build_api_event(id: "nfl_game", sport_key: "americanfootball_nfl")])
+    stub_odds_request("basketball_nba", [ build_api_event(id: "nba_game") ])
+    stub_odds_request("americanfootball_nfl", [ build_api_event(id: "nfl_game", sport_key: "americanfootball_nfl") ])
 
-    result = @sync.sync_all(["basketball_nba", "americanfootball_nfl"])
+    result = @sync.sync_all([ "basketball_nba", "americanfootball_nfl" ])
 
     assert_equal 2, result[:sports_synced]
     assert_equal 2, result[:total_games_created]
@@ -34,7 +34,7 @@ class OddsApi::SportsSyncTest < ActiveSupport::TestCase
 
   test "handles API errors gracefully" do
     stub_request(:get, "https://api.the-odds-api.com/v4/sports/basketball_nba/odds/")
-      .with(query: hash_including({ apiKey: ENV['ODDS_API_KEY'] }))
+      .with(query: hash_including({ apiKey: ENV["ODDS_API_KEY"] }))
       .to_return(status: 429, body: { message: "Rate limit exceeded" }.to_json)
 
     result = @sync.sync_sport("basketball_nba")
@@ -44,12 +44,12 @@ class OddsApi::SportsSyncTest < ActiveSupport::TestCase
   end
 
   test "collects errors from multiple sport syncs" do
-    stub_odds_request("basketball_nba", [build_api_event])
+    stub_odds_request("basketball_nba", [ build_api_event ])
     stub_request(:get, "https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds/")
-      .with(query: hash_including({ apiKey: ENV['ODDS_API_KEY'] }))
+      .with(query: hash_including({ apiKey: ENV["ODDS_API_KEY"] }))
       .to_return(status: 500, body: "API error")
 
-    result = @sync.sync_all(["basketball_nba", "americanfootball_nfl"])
+    result = @sync.sync_all([ "basketball_nba", "americanfootball_nfl" ])
 
     assert_equal 1, result[:sports_synced]
     assert_equal 1, result[:errors].length
@@ -58,15 +58,15 @@ class OddsApi::SportsSyncTest < ActiveSupport::TestCase
   end
 
   test "uses correct regions and markets" do
-    custom_sync = OddsApi::SportsSync.new(regions: ["us"], markets: ["h2h"])
+    custom_sync = OddsApi::SportsSync.new(regions: [ "us" ], markets: [ "h2h" ])
 
     stub_request(:get, "https://api.the-odds-api.com/v4/sports/basketball_nba/odds/")
       .with(query: hash_including({
-        apiKey: ENV['ODDS_API_KEY'],
+        apiKey: ENV["ODDS_API_KEY"],
         regions: "us",
         markets: "h2h"
       }))
-      .to_return(status: 200, body: [].to_json, headers: { 'Content-Type' => 'application/json' })
+      .to_return(status: 200, body: [].to_json, headers: { "Content-Type" => "application/json" })
 
     result = custom_sync.sync_sport("basketball_nba")
     assert result[:success]
@@ -101,11 +101,11 @@ class OddsApi::SportsSyncTest < ActiveSupport::TestCase
 
   def stub_odds_request(sport, events)
     stub_request(:get, "https://api.the-odds-api.com/v4/sports/#{sport}/odds/")
-      .with(query: hash_including({ apiKey: ENV['ODDS_API_KEY'] }))
+      .with(query: hash_including({ apiKey: ENV["ODDS_API_KEY"] }))
       .to_return(
         status: 200,
         body: events.to_json,
-        headers: { 'Content-Type' => 'application/json' }
+        headers: { "Content-Type" => "application/json" }
       )
   end
 

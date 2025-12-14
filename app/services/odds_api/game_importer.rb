@@ -66,7 +66,7 @@ module OddsApi
       game = Game.find_by(external_id: external_id)
 
       if game
-        [game, false] # existing game
+        [ game, false ] # existing game
       else
         # Create new game
         new_game = Game.new(
@@ -75,7 +75,7 @@ module OddsApi
           data_source: "the_odds_api",
           status: "scheduled"
         )
-        [new_game, true] # new game
+        [ new_game, true ] # new game
       end
     end
 

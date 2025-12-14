@@ -23,8 +23,8 @@ class CreateBets < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :bets, [:user_id, :status]
-    add_index :bets, [:game_id, :status]
+    add_index :bets, [ :user_id, :status ]
+    add_index :bets, [ :game_id, :status ]
     add_index :bets, :created_at
   end
 end

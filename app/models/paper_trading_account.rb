@@ -6,7 +6,7 @@ class PaperTradingAccount < ApplicationRecord
   validates :currency, presence: true
 
   # Find or create an account for a customer with a starting balance
-  def self.find_or_create_for_customer(customer_id, starting_balance: 1000.0, currency: 'USD')
+  def self.find_or_create_for_customer(customer_id, starting_balance: 1000.0, currency: "USD")
     find_or_create_by!(customer_id: customer_id) do |account|
       account.balance = starting_balance
       account.currency = currency

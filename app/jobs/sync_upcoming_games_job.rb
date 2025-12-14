@@ -43,7 +43,7 @@ class SyncUpcomingGamesJob < ApplicationJob
       JobExecution.record(self.class.name, executed_at: execution_time)
     rescue => e
       Rails.logger.error("Upcoming games sync failed: #{e.message}")
-      JobExecution.record(self.class.name, status: 'failed', executed_at: execution_time)
+      JobExecution.record(self.class.name, status: "failed", executed_at: execution_time)
       raise
     end
   end

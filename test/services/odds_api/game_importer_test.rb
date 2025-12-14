@@ -19,7 +19,7 @@ class OddsApi::GameImporterTest < ActiveSupport::TestCase
       sport_key: "basketball_nba"
     )
 
-    assert_difference 'Game.count', 1 do
+    assert_difference "Game.count", 1 do
       game = @importer.import_event(api_event)
 
       assert_equal "game_abc_123", game.external_id
@@ -50,7 +50,7 @@ class OddsApi::GameImporterTest < ActiveSupport::TestCase
       sport_key: "basketball_nba"
     )
 
-    assert_no_difference 'Game.count' do
+    assert_no_difference "Game.count" do
       game = @importer.import_event(api_event)
       assert_equal existing_game.id, game.id
     end
@@ -195,7 +195,7 @@ class OddsApi::GameImporterTest < ActiveSupport::TestCase
       ]
     )
 
-    assert_no_difference 'BettingLine.count' do
+    assert_no_difference "BettingLine.count" do
       game = @importer.import_event(api_event)
       existing_line.reload
       assert_equal -150, existing_line.home_odds
@@ -264,7 +264,7 @@ class OddsApi::GameImporterTest < ActiveSupport::TestCase
       build_api_event(id: "game_2", home_team: "Golden State Warriors", away_team: "Los Angeles Lakers")
     ]
 
-    assert_difference 'Game.count', 2 do
+    assert_difference "Game.count", 2 do
       result = @importer.import_events(events)
 
       assert_equal 2, result[:games_created]
