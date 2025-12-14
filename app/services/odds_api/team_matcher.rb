@@ -35,10 +35,19 @@ module OddsApi
       # Example: "Boston College Eagles" should NOT match "Georgia Southern Eagles"
       teams = Team.where(sport: sport)
 
-      # Find teams where the normalized full name matches exactly
-      teams.find do |team|
-        full_name = "#{team.city} #{team.name}".strip
+      # First, try to match against full name (city + team name)
+      team = teams.find do |t|
+        full_name = "#{t.city} #{t.name}".strip
         normalize_name(full_name) == normalized_name
+      end
+
+      return team if team
+
+      # If no full name match, try to match against just the team name
+      # This handles cases like searching for "Lakers" when the team is stored as
+      # city="Los Angeles", name="Lakers"
+      teams.find do |t|
+        normalize_name(t.name) == normalized_name
       end
     end
 
