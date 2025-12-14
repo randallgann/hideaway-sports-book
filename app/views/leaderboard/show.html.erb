@@ -1,0 +1,185 @@
+<div class="w-full">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-0">Leaderboard</h1>
+    <div class="text-gray-400 text-sm">
+      <%= @total_players %> <%= "player".pluralize(@total_players) %> competing
+    </div>
+  </div>
+
+  <%# Current user position indicator (if not on current page) %>
+  <% if user_signed_in? && @current_user_rank && !@users.map(&:id).include?(current_user.id) %>
+    <div class="bg-[#1a1a2e] border border-[#4CAF50] rounded-lg p-4 mb-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <span class="text-[#4CAF50] font-bold text-xl">#<%= @current_user_rank %></span>
+          <span class="text-white font-medium">Your Position</span>
+        </div>
+        <div class="text-right">
+          <div class="text-white font-bold"><%= number_to_currency(current_user.bankroll.total_balance) %></div>
+          <div class="text-sm <%= current_user.profit_loss >= 0 ? 'text-green-400' : 'text-red-400' %>">
+            <%= current_user.profit_loss >= 0 ? "+" : "" %><%= number_to_currency(current_user.profit_loss) %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <%# Sort options %>
+  <div class="flex gap-2 mb-6 flex-wrap">
+    <%= link_to "Balance", leaderboard_path(sort: "balance"),
+        class: "px-4 py-2 rounded-lg text-sm font-medium transition-colors #{@sort == 'balance' ? 'bg-[#4CAF50] text-white' : 'bg-[#1a1a2e] text-gray-300 hover:bg-[#252540]'}" %>
+    <%= link_to "Profit", leaderboard_path(sort: "profit"),
+        class: "px-4 py-2 rounded-lg text-sm font-medium transition-colors #{@sort == 'profit' ? 'bg-[#4CAF50] text-white' : 'bg-[#1a1a2e] text-gray-300 hover:bg-[#252540]'}" %>
+    <%= link_to "ROI %", leaderboard_path(sort: "roi"),
+        class: "px-4 py-2 rounded-lg text-sm font-medium transition-colors #{@sort == 'roi' ? 'bg-[#4CAF50] text-white' : 'bg-[#1a1a2e] text-gray-300 hover:bg-[#252540]'}" %>
+    <%= link_to "Win Rate", leaderboard_path(sort: "win_rate"),
+        class: "px-4 py-2 rounded-lg text-sm font-medium transition-colors #{@sort == 'win_rate' ? 'bg-[#4CAF50] text-white' : 'bg-[#1a1a2e] text-gray-300 hover:bg-[#252540]'}" %>
+  </div>
+
+  <% if @users.empty? %>
+    <div class="bg-[#1a1a2e] rounded-lg p-8 text-center">
+      <p class="text-gray-400 text-lg">No players on the leaderboard yet.</p>
+      <p class="text-gray-500 text-sm mt-2">Be the first to place a bet!</p>
+    </div>
+  <% else %>
+    <%# Desktop table %>
+    <div class="hidden md:block bg-[#1a1a2e] rounded-lg overflow-hidden">
+      <table class="w-full">
+        <thead class="bg-[#252540]">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Rank</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Player</th>
+            <th class="px-4 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Balance</th>
+            <th class="px-4 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Profit/Loss</th>
+            <th class="px-4 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">ROI</th>
+            <th class="px-4 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Win Rate</th>
+            <th class="px-4 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Bets</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-700">
+          <% @users.each_with_index do |user, index| %>
+            <% rank = @pagy.offset + index + 1 %>
+            <% is_current_user = user_signed_in? && user.id == current_user.id %>
+            <tr class="<%= is_current_user ? 'bg-[#4CAF50]/10 border-l-4 border-[#4CAF50]' : 'hover:bg-[#252540]' %>">
+              <td class="px-4 py-4 whitespace-nowrap">
+                <span class="<%= rank <= 3 ? 'text-2xl' : 'text-gray-300 font-medium' %>">
+                  <%= rank_badge(rank) %>
+                </span>
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap">
+                <span class="text-white font-medium"><%= user.display_name %></span>
+                <% if is_current_user %>
+                  <span class="ml-2 text-xs text-[#4CAF50]">(You)</span>
+                <% end %>
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap text-right">
+                <% balance = user.respond_to?(:total_balance) && user.total_balance ? user.total_balance : user.bankroll&.total_balance %>
+                <span class="text-white font-bold"><%= number_to_currency(balance || 0) %></span>
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap text-right">
+                <% profit = user.respond_to?(:profit) && user.profit ? user.profit : user.profit_loss %>
+                <span class="<%= profit >= 0 ? 'text-green-400' : 'text-red-400' %>">
+                  <%= profit >= 0 ? "+" : "" %><%= number_to_currency(profit) %>
+                </span>
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap text-right">
+                <% roi = user.respond_to?(:roi) && user.roi ? user.roi : user.roi_percentage %>
+                <span class="<%= roi >= 0 ? 'text-green-400' : 'text-red-400' %>">
+                  <%= roi >= 0 ? "+" : "" %><%= number_to_percentage(roi, precision: 1) %>
+                </span>
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap text-right">
+                <% win_rate = user.respond_to?(:win_rate) && user.win_rate ? user.win_rate : user.win_rate_percentage %>
+                <% if win_rate.nil? %>
+                  <span class="text-gray-500">--</span>
+                <% else %>
+                  <span class="text-gray-300"><%= number_to_percentage(win_rate, precision: 1) %></span>
+                <% end %>
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap text-right">
+                <span class="text-gray-300"><%= user.bets_count %></span>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <%# Mobile cards %>
+    <div class="md:hidden space-y-4">
+      <% @users.each_with_index do |user, index| %>
+        <% rank = @pagy.offset + index + 1 %>
+        <% is_current_user = user_signed_in? && user.id == current_user.id %>
+        <div class="bg-[#1a1a2e] rounded-lg p-4 <%= is_current_user ? 'border-2 border-[#4CAF50]' : '' %>">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <span class="<%= rank <= 3 ? 'text-2xl' : 'text-xl text-gray-300 font-bold' %>">
+                <%= rank_badge(rank) %>
+              </span>
+              <div>
+                <span class="text-white font-medium"><%= user.display_name %></span>
+                <% if is_current_user %>
+                  <span class="ml-2 text-xs text-[#4CAF50]">(You)</span>
+                <% end %>
+              </div>
+            </div>
+            <div class="text-right">
+              <% balance = user.respond_to?(:total_balance) && user.total_balance ? user.total_balance : user.bankroll&.total_balance %>
+              <div class="text-white font-bold"><%= number_to_currency(balance || 0) %></div>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-sm">
+            <div>
+              <div class="text-gray-500 text-xs">Profit</div>
+              <% profit = user.respond_to?(:profit) && user.profit ? user.profit : user.profit_loss %>
+              <div class="<%= profit >= 0 ? 'text-green-400' : 'text-red-400' %>">
+                <%= profit >= 0 ? "+" : "" %><%= number_to_currency(profit) %>
+              </div>
+            </div>
+            <div>
+              <div class="text-gray-500 text-xs">ROI</div>
+              <% roi = user.respond_to?(:roi) && user.roi ? user.roi : user.roi_percentage %>
+              <div class="<%= roi >= 0 ? 'text-green-400' : 'text-red-400' %>">
+                <%= roi >= 0 ? "+" : "" %><%= number_to_percentage(roi, precision: 1) %>
+              </div>
+            </div>
+            <div>
+              <div class="text-gray-500 text-xs">Win Rate</div>
+              <% win_rate = user.respond_to?(:win_rate) && user.win_rate ? user.win_rate : user.win_rate_percentage %>
+              <div class="text-gray-300">
+                <%= win_rate.nil? ? "--" : number_to_percentage(win_rate, precision: 1) %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <%# Pagination %>
+    <% if @pagy.pages > 1 %>
+      <div class="mt-6 flex justify-center">
+        <nav class="flex items-center gap-1" aria-label="Pagination">
+          <% if @pagy.prev %>
+            <%= link_to leaderboard_path(sort: @sort, page: @pagy.prev), class: "px-3 py-2 rounded-lg bg-[#1a1a2e] text-gray-300 hover:bg-[#252540] transition-colors" do %>
+              <span>&laquo; Prev</span>
+            <% end %>
+          <% else %>
+            <span class="px-3 py-2 rounded-lg bg-[#1a1a2e] text-gray-600 cursor-not-allowed">&laquo; Prev</span>
+          <% end %>
+
+          <span class="px-4 py-2 text-gray-400">
+            Page <%= @pagy.page %> of <%= @pagy.pages %>
+          </span>
+
+          <% if @pagy.next %>
+            <%= link_to leaderboard_path(sort: @sort, page: @pagy.next), class: "px-3 py-2 rounded-lg bg-[#1a1a2e] text-gray-300 hover:bg-[#252540] transition-colors" do %>
+              <span>Next &raquo;</span>
+            <% end %>
+          <% else %>
+            <span class="px-3 py-2 rounded-lg bg-[#1a1a2e] text-gray-600 cursor-not-allowed">Next &raquo;</span>
+          <% end %>
+        </nav>
+      </div>
+    <% end %>
+  <% end %>
+</div>

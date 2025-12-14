@@ -1,6 +1,6 @@
 class Bet < ApplicationRecord
   # Associations
-  belongs_to :user
+  belongs_to :user, counter_cache: true
   belongs_to :game
   belongs_to :betting_line, counter_cache: true
 
@@ -53,6 +53,9 @@ class Bet < ApplicationRecord
   before_validation :snapshot_odds, on: :create
   before_validation :calculate_potential_payout, on: :create
   before_validation :populate_metadata, on: :create
+
+  # Update user result counters when bet status changes
+  after_commit :update_user_result_counters, if: :saved_change_to_status?
 
   # Calculate potential payout from American odds
   def calculate_potential_payout
@@ -202,5 +205,15 @@ class Bet < ApplicationRecord
         settlement_notes: "Push - stake returned"
       )
     end
+  end
+
+  def update_user_result_counters
+    return unless user
+
+    user.update_columns(
+      won_bets_count: user.bets.won.count,
+      lost_bets_count: user.bets.lost.count,
+      push_bets_count: user.bets.where(status: "push").count
+    )
   end
 end

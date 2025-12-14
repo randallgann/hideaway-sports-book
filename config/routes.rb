@@ -26,6 +26,9 @@ Rails.application.routes.draw do
   # House dashboard (public - no auth required)
   resource :house, only: [ :show ], controller: "house"
 
+  # Leaderboard (public - no auth required)
+  resource :leaderboard, only: [ :show ], controller: "leaderboard"
+
   # Set the homepage to show all games
   root "games#index"
 
