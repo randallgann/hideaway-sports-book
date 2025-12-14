@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_14_210213) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_14_225048) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -41,6 +41,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_14_210213) do
     t.string "payment_processor", default: "paper_trading", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["available_balance", "locked_balance"], name: "index_bankrolls_on_balance_for_leaderboard"
     t.index ["user_id"], name: "index_bankrolls_on_user_id", unique: true
   end
 
@@ -268,22 +269,28 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_14_210213) do
   end
 
   create_table "users", force: :cascade do |t|
+    t.integer "bets_count", default: 0, null: false
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.boolean "house", default: false, null: false
+    t.integer "lost_bets_count", default: 0, null: false
     t.string "name"
     t.string "provider"
+    t.integer "push_bets_count", default: 0, null: false
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
+    t.boolean "show_on_leaderboard", default: true, null: false
     t.string "uid"
     t.datetime "updated_at", null: false
     t.string "username"
+    t.integer "won_bets_count", default: 0, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["house"], name: "index_users_on_house", unique: true, where: "(house = true)"
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["show_on_leaderboard"], name: "index_users_on_show_on_leaderboard"
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 

@@ -45,6 +45,9 @@ gem "image_processing", "~> 1.2"
 # HTTP client for API requests
 gem "httparty"
 
+# Pagination
+gem "pagy", "~> 9.4"
+
 # Authentication
 gem "devise", "~> 4.9"
 
