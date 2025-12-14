@@ -388,4 +388,61 @@ class BankrollTest < ActiveSupport::TestCase
     assert_equal 75.00, @bankroll.available_balance # 100 - 25
     assert_equal 0.00, @bankroll.locked_balance
   end
+
+  # receive_vig tests (house account)
+  test "receive_vig adds vig to available balance" do
+    @bankroll.update!(available_balance: 100.00)
+
+    result = @bankroll.receive_vig(25.00, "bet_123")
+
+    assert result[:success]
+    assert_equal 125.00, @bankroll.reload.available_balance
+  end
+
+  test "receive_vig creates vig_received transaction" do
+    @bankroll.update!(available_balance: 100.00)
+
+    @bankroll.receive_vig(25.00, "bet_123")
+
+    transaction = @bankroll.bankroll_transactions.last
+    assert_equal "vig_received", transaction.transaction_type
+    assert_equal 25.00, transaction.amount
+    assert_equal "bet_123", transaction.reference_id
+    assert_equal 100.00, transaction.balance_before
+    assert_equal 125.00, transaction.balance_after
+  end
+
+  test "receive_vig fails with zero amount" do
+    result = @bankroll.receive_vig(0, "bet_123")
+
+    assert_not result[:success]
+    assert_includes result[:message], "must be positive"
+  end
+
+  test "receive_vig fails with negative amount" do
+    result = @bankroll.receive_vig(-10.00, "bet_123")
+
+    assert_not result[:success]
+    assert_includes result[:message], "must be positive"
+  end
+
+  test "receive_vig stores metadata" do
+    @bankroll.update!(available_balance: 100.00)
+
+    @bankroll.receive_vig(25.00, "bet_123", metadata: { game_id: 456, user_id: 789 })
+
+    transaction = @bankroll.bankroll_transactions.last
+    assert_equal 456, transaction.metadata["game_id"]
+    assert_equal 789, transaction.metadata["user_id"]
+  end
+
+  test "receive_vig description includes bet id" do
+    @bankroll.update!(available_balance: 100.00)
+
+    @bankroll.receive_vig(25.00, "bet_123")
+
+    transaction = @bankroll.bankroll_transactions.last
+    assert_includes transaction.description, "bet_123"
+    assert_includes transaction.description, "Vig"
+  end
 end

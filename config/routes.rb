@@ -1,27 +1,30 @@
 Rails.application.routes.draw do
   devise_for :users, controllers: {
-    omniauth_callbacks: 'users/omniauth_callbacks'
+    omniauth_callbacks: "users/omniauth_callbacks"
   }
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Games routes
-  resources :games, only: [:index]
+  resources :games, only: [ :index ]
 
   # Static pages
   get "faq", to: "pages#faq"
 
   # Bankroll routes
-  resource :bankroll, only: [:show] do
+  resource :bankroll, only: [ :show ] do
     post :deposit
     post :withdraw
   end
 
   # Betting routes
-  resources :bets, only: [:index, :show, :create] do
+  resources :bets, only: [ :index, :show, :create ] do
     member do
       post :cancel
     end
   end
+
+  # House dashboard (public - no auth required)
+  resource :house, only: [ :show ], controller: "house"
 
   # Set the homepage to show all games
   root "games#index"

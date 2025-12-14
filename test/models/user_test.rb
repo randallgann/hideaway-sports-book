@@ -202,4 +202,71 @@ class UserTest < ActiveSupport::TestCase
     assert_equal existing_user.id, user.id
     assert_equal "existing@example.com", user.email # Should not update
   end
+
+  # House user singleton tests
+  test "User.house creates house user if not exists" do
+    # Ensure no house user exists
+    User.where(house: true).destroy_all
+
+    house_user = User.house
+
+    assert house_user.persisted?
+    assert house_user.house?
+    assert_equal "house@hideaway.local", house_user.email
+    assert_equal "The House", house_user.name
+  end
+
+  test "User.house returns existing house user" do
+    # Ensure no house user exists
+    User.where(house: true).destroy_all
+
+    first_call = User.house
+    second_call = User.house
+
+    assert_equal first_call.id, second_call.id
+  end
+
+  test "User.house creates bankroll for house user" do
+    User.where(house: true).destroy_all
+
+    house_user = User.house
+
+    assert house_user.bankroll.present?
+    assert_equal Bankroll::INITIAL_BALANCE, house_user.bankroll.available_balance
+  end
+
+  test "only one house user can exist" do
+    User.where(house: true).destroy_all
+
+    # Create first house user
+    User.house
+
+    # Attempting to create another house user should fail
+    duplicate = User.new(
+      email: "fake_house@example.com",
+      password: "password123",
+      house: true
+    )
+
+    assert_not duplicate.valid?
+    assert_includes duplicate.errors[:house], "has already been taken"
+  end
+
+  test "house user has house flag set to true" do
+    User.where(house: true).destroy_all
+
+    house_user = User.house
+
+    assert_equal true, house_user.house
+  end
+
+  test "regular users have house flag set to false" do
+    user = User.create!(
+      email: "regular@example.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
+
+    assert_equal false, user.house
+  end
 end
