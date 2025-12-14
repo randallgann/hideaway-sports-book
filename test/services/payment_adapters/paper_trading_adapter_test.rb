@@ -118,7 +118,7 @@ class PaymentAdapters::PaperTradingAdapterTest < ActiveSupport::TestCase
 
     assert result[:success]
     assert_equal 800.00, result[:balance] # 1000 - 200
-    assert_equal 'USD', result[:currency]
+    assert_equal "USD", result[:currency]
   end
 
   test "get_balance creates account if not exists" do
@@ -132,12 +132,12 @@ class PaymentAdapters::PaperTradingAdapterTest < ActiveSupport::TestCase
     result = @adapter.create_customer(
       customer_id: @customer_id,
       starting_balance: 500.00,
-      currency: 'USD'
+      currency: "USD"
     )
 
     assert result[:success]
     assert_equal 500.00, result[:balance]
-    assert_equal 'USD', result[:currency]
+    assert_equal "USD", result[:currency]
   end
 
   test "validate_payment_method always returns true" do
@@ -167,7 +167,7 @@ class PaymentAdapters::PaperTradingAdapterTest < ActiveSupport::TestCase
 
     transaction = PaperTradingTransaction.find_by(transaction_id: charge_result[:transaction_id])
     assert transaction.present?
-    assert_equal 'charge', transaction.transaction_type
+    assert_equal "charge", transaction.transaction_type
     assert_equal 50.00, transaction.amount
   end
 

@@ -1,9 +1,9 @@
-require 'httparty'
+require "httparty"
 
 module OddsApi
   class Client
     include HTTParty
-    base_uri 'https://api.the-odds-api.com/v4'
+    base_uri "https://api.the-odds-api.com/v4"
 
     attr_reader :api_key, :requests_remaining, :requests_used
 
@@ -15,7 +15,7 @@ module OddsApi
     class RateLimitError < ApiError; end
     class TimeoutError < ApiError; end
 
-    def initialize(api_key: ENV['ODDS_API_KEY'])
+    def initialize(api_key: ENV["ODDS_API_KEY"])
       @api_key = api_key
       raise MissingApiKeyError, "ODDS_API_KEY environment variable is not set" if @api_key.nil? || @api_key.empty?
 
@@ -39,12 +39,12 @@ module OddsApi
     # @param markets [Array<String>] Markets to include (default: ["h2h", "spreads", "totals"])
     # @param odds_format [String] Format for odds (default: "american")
     # Returns an array of event objects with odds
-    def fetch_odds(sport, regions: ["us"], markets: ["h2h", "spreads", "totals"], odds_format: "american")
+    def fetch_odds(sport, regions: [ "us" ], markets: [ "h2h", "spreads", "totals" ], odds_format: "american")
       Rails.logger.info("OddsAPI: Fetching odds for #{sport} (regions: #{regions.join(',')}, markets: #{markets.join(',')})")
 
       params = {
-        regions: regions.join(','),
-        markets: markets.join(','),
+        regions: regions.join(","),
+        markets: markets.join(","),
         oddsFormat: odds_format
       }
 
@@ -103,15 +103,15 @@ module OddsApi
     def parse_error_message(response)
       begin
         parsed = JSON.parse(response.body)
-        parsed['message'] || response.body
+        parsed["message"] || response.body
       rescue JSON::ParserError
         response.body
       end
     end
 
     def update_rate_limit_info(headers)
-      @requests_remaining = headers['x-requests-remaining'].to_i if headers['x-requests-remaining']
-      @requests_used = headers['x-requests-used'].to_i if headers['x-requests-used']
+      @requests_remaining = headers["x-requests-remaining"].to_i if headers["x-requests-remaining"]
+      @requests_used = headers["x-requests-used"].to_i if headers["x-requests-used"]
     end
   end
 end

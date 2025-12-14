@@ -18,7 +18,7 @@ module PaymentAdapters
     # @param currency [String] Currency code (default: 'USD')
     # @param options [Hash] Additional options (customer_id, payment_method, metadata, etc.)
     # @return [Hash] Payment result with :success, :transaction_id, :amount, :message
-    def charge(amount, currency: 'USD', **options)
+    def charge(amount, currency: "USD", **options)
       raise NotImplementedError, "#{self.class} must implement #charge"
     end
 
@@ -37,7 +37,7 @@ module PaymentAdapters
     # @param currency [String] Currency code
     # @param options [Hash] Additional options (customer_id, payment_method, metadata, etc.)
     # @return [Hash] Withdrawal result with :success, :withdrawal_id, :amount, :message
-    def withdraw(amount, currency: 'USD', **options)
+    def withdraw(amount, currency: "USD", **options)
       raise NotImplementedError, "#{self.class} must implement #withdraw"
     end
 
@@ -65,7 +65,7 @@ module PaymentAdapters
     # Get the name of this payment adapter
     # @return [String] Adapter name
     def name
-      self.class.name.demodulize.gsub('Adapter', '')
+      self.class.name.demodulize.gsub("Adapter", "")
     end
 
     # Check if this adapter supports a given feature
@@ -83,7 +83,7 @@ module PaymentAdapters
     # Override in subclasses to specify supported features
     # @return [Array<Symbol>] List of supported features
     def supported_features
-      [:charge, :refund, :withdraw, :balance, :customer_creation, :payment_validation]
+      [ :charge, :refund, :withdraw, :balance, :customer_creation, :payment_validation ]
     end
 
     # Validate adapter configuration

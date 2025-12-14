@@ -47,7 +47,7 @@ class SyncDistantGamesJobTest < ActiveJob::TestCase
 
     # Mock the OddsApi::SportsSync to avoid actual API calls
     mock_syncer = Minitest::Mock.new
-    mock_syncer.expect :sync_sport, { success: true, games_updated: 1 }, ["basketball_nba"]
+    mock_syncer.expect :sync_sport, { success: true, games_updated: 1 }, [ "basketball_nba" ]
 
     OddsApi::SportsSync.stub :new, mock_syncer do
       assert_nothing_raised do

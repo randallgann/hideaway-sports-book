@@ -26,7 +26,7 @@ namespace :odds do
   end
 
   desc "Sync odds for a specific sport (e.g., rake odds:sync_sport[basketball_nba])"
-  task :sync_sport, [:sport_key] => :environment do |t, args|
+  task :sync_sport, [ :sport_key ] => :environment do |t, args|
     sport_key = args[:sport_key]
 
     if sport_key.nil?

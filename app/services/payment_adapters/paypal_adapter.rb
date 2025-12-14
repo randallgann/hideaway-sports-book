@@ -14,19 +14,19 @@ module PaymentAdapters
     # @param currency [String] Currency code
     # @param options [Hash] PayPal-specific options (:payer_id, :payment_token, :description, etc.)
     # @return [Hash] Payment result
-    def charge(amount, currency: 'USD', **options)
+    def charge(amount, currency: "USD", **options)
       validate_amount!(amount)
 
       # Build PayPal payment request
       payment_request = {
-        intent: 'CAPTURE',
+        intent: "CAPTURE",
         purchase_units: [
           {
             amount: {
               currency_code: currency,
               value: format_amount(amount)
             },
-            description: options[:description] || 'Sportsbook payment'
+            description: options[:description] || "Sportsbook payment"
           }
         ]
       }
@@ -76,7 +76,7 @@ module PaymentAdapters
         validate_amount!(amount)
         refund_request[:amount] = {
           value: format_amount(amount),
-          currency_code: options[:currency] || 'USD'
+          currency_code: options[:currency] || "USD"
         }
       end
 
@@ -111,7 +111,7 @@ module PaymentAdapters
     # @param currency [String] Currency code
     # @param options [Hash] PayPal-specific options
     # @return [Hash] Withdrawal result
-    def withdraw(amount, currency: 'USD', **options)
+    def withdraw(amount, currency: "USD", **options)
       validate_amount!(amount)
 
       # In production with PayPal Payouts API
@@ -151,7 +151,7 @@ module PaymentAdapters
       # You would typically verify the customer exists
       success_response(
         balance: nil,
-        currency: 'USD',
+        currency: "USD",
         customer_id: customer_id,
         message: "PayPal does not expose customer balances. Account verification would happen here (mock response)"
       )
@@ -200,13 +200,13 @@ module PaymentAdapters
     protected
 
     def supported_features
-      [:charge, :refund, :payment_validation, :webhooks, :subscriptions]
+      [ :charge, :refund, :payment_validation, :webhooks, :subscriptions ]
     end
 
     def validate_configuration!
       missing_configs = []
-      missing_configs << 'client_id' unless config[:client_id] || ENV['PAYPAL_CLIENT_ID']
-      missing_configs << 'client_secret' unless config[:client_secret] || ENV['PAYPAL_CLIENT_SECRET']
+      missing_configs << "client_id" unless config[:client_id] || ENV["PAYPAL_CLIENT_ID"]
+      missing_configs << "client_secret" unless config[:client_secret] || ENV["PAYPAL_CLIENT_SECRET"]
 
       if missing_configs.any?
         raise ArgumentError, "PayPal configuration missing: #{missing_configs.join(', ')}"
@@ -232,7 +232,7 @@ module PaymentAdapters
     # @param amount [Numeric] Amount in dollars
     # @return [String] Formatted amount
     def format_amount(amount)
-      format('%.2f', amount.to_f)
+      format("%.2f", amount.to_f)
     end
   end
 end

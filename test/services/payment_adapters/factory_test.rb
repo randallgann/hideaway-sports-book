@@ -9,30 +9,30 @@ class PaymentAdapters::FactoryTest < ActiveSupport::TestCase
 
   test "create returns correct adapter type for stripe" do
     # Stub the Stripe configuration check
-    ENV['STRIPE_SECRET_KEY'] = 'sk_test_fake'
+    ENV["STRIPE_SECRET_KEY"] = "sk_test_fake"
 
     adapter = PaymentAdapters::Factory.create(:stripe)
 
     assert_instance_of PaymentAdapters::StripeAdapter, adapter
   ensure
-    ENV.delete('STRIPE_SECRET_KEY')
+    ENV.delete("STRIPE_SECRET_KEY")
   end
 
   test "create returns correct adapter type for paypal" do
     # Stub the PayPal configuration check
-    ENV['PAYPAL_CLIENT_ID'] = 'fake_client_id'
-    ENV['PAYPAL_CLIENT_SECRET'] = 'fake_client_secret'
+    ENV["PAYPAL_CLIENT_ID"] = "fake_client_id"
+    ENV["PAYPAL_CLIENT_SECRET"] = "fake_client_secret"
 
     adapter = PaymentAdapters::Factory.create(:paypal)
 
     assert_instance_of PaymentAdapters::PaypalAdapter, adapter
   ensure
-    ENV.delete('PAYPAL_CLIENT_ID')
-    ENV.delete('PAYPAL_CLIENT_SECRET')
+    ENV.delete("PAYPAL_CLIENT_ID")
+    ENV.delete("PAYPAL_CLIENT_SECRET")
   end
 
   test "create with string adapter type" do
-    adapter = PaymentAdapters::Factory.create('paper_trading')
+    adapter = PaymentAdapters::Factory.create("paper_trading")
 
     assert_instance_of PaymentAdapters::PaperTradingAdapter, adapter
   end
@@ -56,17 +56,17 @@ class PaymentAdapters::FactoryTest < ActiveSupport::TestCase
   end
 
   test "create_from_env uses PAYMENT_PROCESSOR environment variable" do
-    ENV['PAYMENT_PROCESSOR'] = 'paper_trading'
+    ENV["PAYMENT_PROCESSOR"] = "paper_trading"
 
     adapter = PaymentAdapters::Factory.create_from_env
 
     assert_instance_of PaymentAdapters::PaperTradingAdapter, adapter
   ensure
-    ENV.delete('PAYMENT_PROCESSOR')
+    ENV.delete("PAYMENT_PROCESSOR")
   end
 
   test "create_from_env defaults to paper_trading" do
-    ENV.delete('PAYMENT_PROCESSOR')
+    ENV.delete("PAYMENT_PROCESSOR")
 
     adapter = PaymentAdapters::Factory.create_from_env
 
@@ -86,7 +86,7 @@ class PaymentAdapters::FactoryTest < ActiveSupport::TestCase
     assert PaymentAdapters::Factory.adapter_available?(:paper_trading)
     assert PaymentAdapters::Factory.adapter_available?(:stripe)
     assert PaymentAdapters::Factory.adapter_available?(:paypal)
-    assert PaymentAdapters::Factory.adapter_available?('paper_trading')
+    assert PaymentAdapters::Factory.adapter_available?("paper_trading")
   end
 
   test "adapter_available? returns false for invalid adapters" do
@@ -97,12 +97,12 @@ class PaymentAdapters::FactoryTest < ActiveSupport::TestCase
   test "adapter_info returns information about adapter" do
     info = PaymentAdapters::Factory.adapter_info(:paper_trading)
 
-    assert_equal 'PaperTrading', info[:name]
+    assert_equal "PaperTrading", info[:name]
     assert_equal :paper_trading, info[:type]
     assert_includes info[:supported_features], :charge
     assert_includes info[:supported_features], :refund
     assert_includes info[:supported_features], :withdraw
-    assert_equal 'PaymentAdapters::PaperTradingAdapter', info[:class]
+    assert_equal "PaymentAdapters::PaperTradingAdapter", info[:class]
   end
 
   test "adapter_info returns nil for unknown adapter" do
@@ -112,9 +112,9 @@ class PaymentAdapters::FactoryTest < ActiveSupport::TestCase
   end
 
   test "list_all returns info for all adapters" do
-    ENV['STRIPE_SECRET_KEY'] = 'sk_test_fake'
-    ENV['PAYPAL_CLIENT_ID'] = 'fake_id'
-    ENV['PAYPAL_CLIENT_SECRET'] = 'fake_secret'
+    ENV["STRIPE_SECRET_KEY"] = "sk_test_fake"
+    ENV["PAYPAL_CLIENT_ID"] = "fake_id"
+    ENV["PAYPAL_CLIENT_SECRET"] = "fake_secret"
 
     all_adapters = PaymentAdapters::Factory.list_all
 
@@ -131,8 +131,8 @@ class PaymentAdapters::FactoryTest < ActiveSupport::TestCase
       assert info[:class].present?
     end
   ensure
-    ENV.delete('STRIPE_SECRET_KEY')
-    ENV.delete('PAYPAL_CLIENT_ID')
-    ENV.delete('PAYPAL_CLIENT_SECRET')
+    ENV.delete("STRIPE_SECRET_KEY")
+    ENV.delete("PAYPAL_CLIENT_ID")
+    ENV.delete("PAYPAL_CLIENT_SECRET")
   end
 end

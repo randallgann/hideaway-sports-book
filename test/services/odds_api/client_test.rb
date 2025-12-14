@@ -6,7 +6,7 @@ class OddsApi::ClientTest < ActiveSupport::TestCase
   end
 
   test "initializes with API key from environment" do
-    assert_equal ENV['ODDS_API_KEY'], @client.api_key
+    assert_equal ENV["ODDS_API_KEY"], @client.api_key
   end
 
   test "raises error when API key is missing" do
@@ -26,14 +26,14 @@ class OddsApi::ClientTest < ActiveSupport::TestCase
 
   test "fetches list of available sports" do
     stub_request(:get, "https://api.the-odds-api.com/v4/sports/")
-      .with(query: hash_including({ apiKey: ENV['ODDS_API_KEY'] }))
+      .with(query: hash_including({ apiKey: ENV["ODDS_API_KEY"] }))
       .to_return(
         status: 200,
         body: [
           { key: "americanfootball_nfl", title: "NFL" },
           { key: "basketball_nba", title: "NBA" }
         ].to_json,
-        headers: { 'Content-Type' => 'application/json' }
+        headers: { "Content-Type" => "application/json" }
       )
 
     sports = @client.fetch_sports
@@ -45,22 +45,22 @@ class OddsApi::ClientTest < ActiveSupport::TestCase
   test "fetches odds for a specific sport" do
     stub_request(:get, "https://api.the-odds-api.com/v4/sports/basketball_nba/odds/")
       .with(query: {
-        apiKey: ENV['ODDS_API_KEY'],
+        apiKey: ENV["ODDS_API_KEY"],
         regions: "us",
         markets: "h2h,spreads,totals",
         oddsFormat: "american"
       })
       .to_return(
         status: 200,
-        body: [{
+        body: [ {
           id: "abc123",
           sport_key: "basketball_nba",
           commence_time: "2025-11-02T00:00:00Z",
           home_team: "Los Angeles Lakers",
           away_team: "Golden State Warriors",
           bookmakers: []
-        }].to_json,
-        headers: { 'Content-Type' => 'application/json' }
+        } ].to_json,
+        headers: { "Content-Type" => "application/json" }
       )
 
     odds = @client.fetch_odds("basketball_nba")
@@ -72,7 +72,7 @@ class OddsApi::ClientTest < ActiveSupport::TestCase
   test "fetches odds with custom regions and markets" do
     stub_request(:get, "https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds/")
       .with(query: {
-        apiKey: ENV['ODDS_API_KEY'],
+        apiKey: ENV["ODDS_API_KEY"],
         regions: "us,uk,eu",
         markets: "h2h",
         oddsFormat: "american"
@@ -80,16 +80,16 @@ class OddsApi::ClientTest < ActiveSupport::TestCase
       .to_return(
         status: 200,
         body: [].to_json,
-        headers: { 'Content-Type' => 'application/json' }
+        headers: { "Content-Type" => "application/json" }
       )
 
-    odds = @client.fetch_odds("americanfootball_nfl", regions: ["us", "uk", "eu"], markets: ["h2h"])
+    odds = @client.fetch_odds("americanfootball_nfl", regions: [ "us", "uk", "eu" ], markets: [ "h2h" ])
     assert_equal 0, odds.length
   end
 
   test "handles 401 unauthorized error" do
     stub_request(:get, "https://api.the-odds-api.com/v4/sports/basketball_nba/odds/")
-      .with(query: hash_including({ apiKey: ENV['ODDS_API_KEY'] }))
+      .with(query: hash_including({ apiKey: ENV["ODDS_API_KEY"] }))
       .to_return(status: 401, body: { message: "Invalid API key" }.to_json)
 
     error = assert_raises(OddsApi::Client::UnauthorizedError) do
@@ -100,7 +100,7 @@ class OddsApi::ClientTest < ActiveSupport::TestCase
 
   test "handles 404 not found error" do
     stub_request(:get, "https://api.the-odds-api.com/v4/sports/invalid_sport/odds/")
-      .with(query: hash_including({ apiKey: ENV['ODDS_API_KEY'] }))
+      .with(query: hash_including({ apiKey: ENV["ODDS_API_KEY"] }))
       .to_return(status: 404, body: { message: "Sport not found" }.to_json)
 
     error = assert_raises(OddsApi::Client::NotFoundError) do
@@ -111,11 +111,11 @@ class OddsApi::ClientTest < ActiveSupport::TestCase
 
   test "handles 429 rate limit error" do
     stub_request(:get, "https://api.the-odds-api.com/v4/sports/basketball_nba/odds/")
-      .with(query: hash_including({ apiKey: ENV['ODDS_API_KEY'] }))
+      .with(query: hash_including({ apiKey: ENV["ODDS_API_KEY"] }))
       .to_return(
         status: 429,
         body: { message: "Rate limit exceeded" }.to_json,
-        headers: { 'x-requests-remaining' => '0' }
+        headers: { "x-requests-remaining" => "0" }
       )
 
     error = assert_raises(OddsApi::Client::RateLimitError) do
@@ -126,7 +126,7 @@ class OddsApi::ClientTest < ActiveSupport::TestCase
 
   test "handles timeout error" do
     stub_request(:get, "https://api.the-odds-api.com/v4/sports/basketball_nba/odds/")
-      .with(query: hash_including({ apiKey: ENV['ODDS_API_KEY'] }))
+      .with(query: hash_including({ apiKey: ENV["ODDS_API_KEY"] }))
       .to_timeout
 
     error = assert_raises(OddsApi::Client::TimeoutError) do
@@ -137,7 +137,7 @@ class OddsApi::ClientTest < ActiveSupport::TestCase
 
   test "handles generic HTTP errors" do
     stub_request(:get, "https://api.the-odds-api.com/v4/sports/basketball_nba/odds/")
-      .with(query: hash_including({ apiKey: ENV['ODDS_API_KEY'] }))
+      .with(query: hash_including({ apiKey: ENV["ODDS_API_KEY"] }))
       .to_return(status: 500, body: "Internal Server Error")
 
     error = assert_raises(OddsApi::Client::ApiError) do
@@ -148,14 +148,14 @@ class OddsApi::ClientTest < ActiveSupport::TestCase
 
   test "parses response headers for rate limit info" do
     stub_request(:get, "https://api.the-odds-api.com/v4/sports/")
-      .with(query: hash_including({ apiKey: ENV['ODDS_API_KEY'] }))
+      .with(query: hash_including({ apiKey: ENV["ODDS_API_KEY"] }))
       .to_return(
         status: 200,
         body: [].to_json,
         headers: {
-          'Content-Type' => 'application/json',
-          'x-requests-remaining' => '450',
-          'x-requests-used' => '50'
+          "Content-Type" => "application/json",
+          "x-requests-remaining" => "450",
+          "x-requests-used" => "50"
         }
       )
 

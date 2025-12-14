@@ -9,6 +9,6 @@ class CreateJobExecutions < ActiveRecord::Migration[8.1]
     end
 
     add_index :job_executions, :job_name
-    add_index :job_executions, [:job_name, :executed_at]
+    add_index :job_executions, [ :job_name, :executed_at ]
   end
 end

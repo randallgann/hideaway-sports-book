@@ -5,7 +5,7 @@ class PaperTradingAccountTest < ActiveSupport::TestCase
     account = PaperTradingAccount.new(
       customer_id: "test_123",
       balance: 1000.00,
-      currency: 'USD'
+      currency: "USD"
     )
 
     assert account.valid?
@@ -40,7 +40,7 @@ class PaperTradingAccountTest < ActiveSupport::TestCase
     assert account.persisted?
     assert_equal "new_customer", account.customer_id
     assert_equal 1000.00, account.balance # Default
-    assert_equal 'USD', account.currency
+    assert_equal "USD", account.currency
   end
 
   test "find_or_create_for_customer finds existing account" do
@@ -59,11 +59,11 @@ class PaperTradingAccountTest < ActiveSupport::TestCase
     account = PaperTradingAccount.find_or_create_for_customer(
       "custom",
       starting_balance: 2000.00,
-      currency: 'EUR'
+      currency: "EUR"
     )
 
     assert_equal 2000.00, account.balance
-    assert_equal 'EUR', account.currency
+    assert_equal "EUR", account.currency
   end
 
   test "debit! reduces balance" do
@@ -108,10 +108,10 @@ class PaperTradingAccountTest < ActiveSupport::TestCase
   test "destroys transactions when account is destroyed" do
     account = PaperTradingAccount.create!(customer_id: "test")
     transaction = account.paper_trading_transactions.create!(
-      transaction_type: 'charge',
+      transaction_type: "charge",
       amount: 50.00,
-      currency: 'USD',
-      transaction_id: 'txn_123'
+      currency: "USD",
+      transaction_id: "txn_123"
     )
 
     account.destroy

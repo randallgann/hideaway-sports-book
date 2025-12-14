@@ -6,7 +6,7 @@ Rails.application.config.after_initialize do
   # Skip for console, rake tasks, and test environment
   next unless Rails.env.development? || Rails.env.production?
   next if defined?(Rails::Console)
-  next if File.basename($0) == 'rake'
+  next if File.basename($0) == "rake"
 
   # Queue the sync job to run asynchronously with a 10 second delay
   # This prevents conflicts with recurring tasks that may also be starting

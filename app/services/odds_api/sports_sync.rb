@@ -7,8 +7,8 @@ module OddsApi
       "americanfootball_ncaaf"
     ].freeze
 
-    DEFAULT_REGIONS = ["us", "uk", "eu"].freeze
-    DEFAULT_MARKETS = ["h2h", "spreads", "totals"].freeze
+    DEFAULT_REGIONS = [ "us", "uk", "eu" ].freeze
+    DEFAULT_MARKETS = [ "h2h", "spreads", "totals" ].freeze
     DEFAULT_REQUEST_DELAY = 2 # seconds between API requests to avoid rate limiting
 
     attr_reader :regions, :markets, :request_delay

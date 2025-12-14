@@ -14,7 +14,7 @@ module PaymentAdapters
     # @param currency [String] Currency code
     # @param options [Hash] Stripe-specific options (:customer, :payment_method, :description, etc.)
     # @return [Hash] Payment result
-    def charge(amount, currency: 'USD', **options)
+    def charge(amount, currency: "USD", **options)
       validate_amount!(amount)
 
       # Stripe requires amounts in cents
@@ -39,7 +39,7 @@ module PaymentAdapters
       # If payment_method is provided, also add confirm and automatic_payment_methods
       if options[:payment_method]
         charge_params[:confirm] = true
-        charge_params[:automatic_payment_methods] = { enabled: true, allow_redirects: 'never' }
+        charge_params[:automatic_payment_methods] = { enabled: true, allow_redirects: "never" }
       end
 
       # Call Stripe API (commented out since stripe gem may not be installed)
@@ -110,7 +110,7 @@ module PaymentAdapters
     # @param currency [String] Currency code
     # @param options [Hash] Stripe-specific options
     # @return [Hash] Withdrawal result
-    def withdraw(amount, currency: 'USD', **options)
+    def withdraw(amount, currency: "USD", **options)
       validate_amount!(amount)
       amount_cents = to_cents(amount)
 
@@ -144,7 +144,7 @@ module PaymentAdapters
 
       success_response(
         balance: 0.0, # Mock
-        currency: 'USD',
+        currency: "USD",
         customer_id: customer_id,
         message: "Stripe balance would be retrieved here (mock response)"
       )
@@ -186,7 +186,7 @@ module PaymentAdapters
       return false if payment_method.blank?
 
       # Check format (Stripe payment methods start with 'pm_')
-      return false unless payment_method.to_s.start_with?('pm_')
+      return false unless payment_method.to_s.start_with?("pm_")
 
       # In production, you would:
       # Stripe::PaymentMethod.retrieve(payment_method)
@@ -202,11 +202,11 @@ module PaymentAdapters
     protected
 
     def supported_features
-      [:charge, :refund, :customer_creation, :payment_validation, :subscriptions, :webhooks]
+      [ :charge, :refund, :customer_creation, :payment_validation, :subscriptions, :webhooks ]
     end
 
     def validate_configuration!
-      unless config[:api_key] || ENV['STRIPE_SECRET_KEY']
+      unless config[:api_key] || ENV["STRIPE_SECRET_KEY"]
         raise ArgumentError, "Stripe API key is required (config[:api_key] or STRIPE_SECRET_KEY env var)"
       end
     end
